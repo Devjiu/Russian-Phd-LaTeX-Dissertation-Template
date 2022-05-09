@@ -13,7 +13,6 @@ $g: Q \longrightarrow \mathbb{R}^n$. Предположим, что удовле
 $$
 V(y, x) = d(y) - d(x) - \langle \nabla d(x), y - x \rangle.
 $$
-
 Введём следующий аналог понятия относительной сильной выпуклости функции \cite{Lu_Nesterov_2018} для вариационных неравенств.
 \begin{definition}\label{DefRelStrongMonot}
 Назовём оператор $g$ относительно $\mu$-сильно монотонным, где $\mu >0$, если для всяких $x, y \in Q$ верно неравенство
@@ -28,7 +27,6 @@ $$
 	 	\mu V(x, y) \leq \langle g(y) - g(x), y - x \rangle.
 	 \end{equation}
 \end{remark}
-
 В рамках данной статьи мы рассмотрим численные методы решения вариационных неравенств с операторами, удовлетворяющими условиям относительной ограниченности, а также относительной гладкости.
 \begin{definition}\label{DefRelBound}\cite{Main}
 Назовём оператор $g: Q \longrightarrow \mathbb{R}^n$ относительно $M$-огранич\-енным, где $M >0$, если для всяких $x, y \in Q$ верно неравенство
@@ -42,6 +40,7 @@ $$
     \langle g(y)-g(z),x-z\rangle \leq LV(x,z) + LV(z,y).
     \end{equation}
 \end{definition}
+
 Отметим, что если функция $f$ $L$-относительно гладкая \cite{Bauschke}, т.е.
 \begin{equation}\label{funct_rel_smooth}
 f(y) \leq f(x) + \langle \nabla f(x), y - x\rangle + LV(y, x) \quad \forall x, y \in Q,
@@ -315,12 +314,13 @@ $$
 Непосредственно проверяются следующие неравенства:
 \begin{gather*}
   \begin{aligned}
-    h_k \langle \nabla f(x_k), x_k - x \rangle \leq h_k \langle \nabla f(x_k), x_k - x_{k+1} \rangle & + \frac{1}{2}\| x - x_k\|^2_2 -  \frac{1}{2}\| x - x_{k+1}\|^2_2 - \frac{1}{2}\| x_{k+1} - x_k\|^2_2 \leq \\
-    \leq h_k \|\nabla f(x_k)\|_2 \| x_{k+1} - x_{k} \|_2 + \frac{1}{2}\| x - x_k\|^2_2 -  &\frac{1}{2}\| x -x_{k+1}\|^2_2 - \frac{1}{2}\| x_{k+1} -x_k\|^2_2 \leq \\ \leq \frac{h^2_k \|\nabla f(x_k)\|^2_2}{2} + \frac{1}{2}\| x - x_k\|^2_2& -  \frac{1}{2}\| x - x_{k+1}\|^2_2.
+    h_k \langle \nabla f(x_k), x_k - x \rangle \leq h_k \langle \nabla f(x_k), x_k - x_{k+1} \rangle & + \frac{1}{2}\| x - x_k\|^2_2 -  \frac{1}{2}\| x - x_{k+1}\|^2_2 - \\
+        - \frac{1}{2}\| x_{k+1} - x_k\|^2_2 \leq \\
+    \leq h_k \|\nabla f(x_k)\|_2 \| x_{k+1} - x_{k} \|_2 + \frac{1}{2}\| x - x_k\|^2_2 -  &\frac{1}{2}\| x -x_{k+1}\|^2_2 - \frac{1}{2}\| x_{k+1} -x_k\|^2_2 \leq \\ 
+    \leq \frac{h^2_k \|\nabla f(x_k)\|^2_2}{2} + \frac{1}{2}\| x - x_k\|^2_2& -  \frac{1}{2}\| x - x_{k+1}\|^2_2.
   \end{aligned}
 \end{gather*}
 \end{proof}
-
 Согласно лемме \ref{lemma_adapt} получим, что для всяких $k \geq 0$ и $x \in Q$: 
 $$
     \langle \nabla f(x_k), x_k - x \rangle \leq \frac{h_k \|\nabla f(x_k)\|^2_2}{2} + \frac{1}{2 h_k}\| x - x_k\|^2_2 - \frac{1}{2 h_k}\| x -x_{k+1}\|^2_2.
@@ -330,9 +330,12 @@ $$
     f(x_k) - f(x)  + \frac{\mu}{2}\|x_k - x \|^2_2 \leq \langle \nabla f(x_k), x_k - x \rangle \;\; \forall x \in Q,
 $$
 откуда при всяком $k \geq 0$:
-$$
-    2k f(x_k) - 2k f(x) + k\mu\|x - x_k \|^2_2 \leq \frac{2k\|\nabla f(x_k)\|^2_2}{\mu(k+1)} + k(k+1)\frac{\mu}{2}\|x - x_k\|^2_2 - k(k+1)\frac{\mu}{2}\|x - x_{k+1}\|^2_2.
-$$
+\begin{gather*}
+  \begin{aligned}
+    2k f(x_k) - 2k f(x) + k\mu\|x - x_k \|^2_2 \leq \frac{2k\|\nabla f(x_k)\|^2_2}{\mu(k+1)} + k(k+1)\frac{\mu}{2}\|x - x_k\|^2_2 -\\
+    - k(k+1)\frac{\mu}{2}\|x - x_{k+1}\|^2_2.
+  \end{aligned}
+\end{gather*}
 
 Пусть алгоритм \eqref{orig} отработал $N$ шагов. Тогда можно просуммировать неравенства по $k$ от 1 до $N$ и учесть, что $\frac{k}{k+1} \leq 1$:
 $$
