@@ -25,8 +25,27 @@
 %%% Математические пакеты %%%
 \usepackage{amsthm,amsmath,amscd}   % Математические дополнения от AMS
 \usepackage{amsfonts,amssymb}       % Математические дополнения от AMS
+\usepackage{systeme}
+\usepackage{lipsum}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 \usepackage{mathtools}              % Добавляет окружение multlined
 \usepackage{xfrac}                  % Красивые дроби
+\theoremstyle{plain}
+\newtheorem{theorem}{Теорема}
+\newtheorem{proposition}{Предложение}
+\newtheorem{assumption}{Предположение}
+\newtheorem{lemma}{Лемма}
+\newtheorem{corollary}{Следствие}
+%\newtheorem{notation}{Обозначения}
+\newtheorem{definition}{Определение}
+\newtheorem{example}{Пример}
+
+\theoremstyle{definition}
+\newtheorem{proof_}{Доказательство}\def\theproof{}
+\newtheorem{remark}{Замечание}
+
+\DeclarePairedDelimiterX{\norm}[1]{\lVert}{\rVert}{#1}
 \usepackage[
     locale = DE,
     list-separator       = {;\,},
