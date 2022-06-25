@@ -1,415 +1,626 @@
 \chapter{Рестарты зеркального спyска для липшицевых задач с yсловием gamma-роста}\label{ch:ch3}
 
-\section{Просто рестарты}\label{sec:ch3/sect1}
+\section{Введение}\label{sec:ch3/sect1}
 
-\begin{theorem} \label{vanilla_mirror}
-    Пусть $f$ --- является $M$-липщицевой на $Q$ относительно некоторой функции Брегмана $V_d(x, y)$ c 1-сильно выпуклой прокс-функцией $d(x)$. Тогда можно задать метод следующим образом:
-    \begin{equation} \label{mirr_upd}
-        x_{k+1} = \arg \min_{x \in Q} {f(x_k) + \langle g(x_k), x - x_k \rangle + \frac{1}{h_k} V_d(x, x_k)},
+    Негладкие оптимизационные задачи часто возникают в самых разных приложениях. Однако известные методы субградиентного типа для таких задач приводят к пессимистичным теоретическим оценкам скорости сходимости в пространствах больших размерностей. Одним из подходов к этой проблеме может служить выделение специального класса задач с условием острого минимума \cite{6, 1}. Говорят, что $f$ удовлетворяет условию острого минимума, если
+    \begin{gather}\label{sm}
+    f(x) - f(x_*) \geq \alpha \min_{x_* \in X_*} \|x- x_*\|_2 \quad \forall x \in Q
+    \end{gather}
+    для некоторого фиксированного $\alpha >0$ и $f(x_*) = f^* = \min\limits_{x\in Q} f(x)$ для всякого $x_* \in X_*$, где $Q$ --- выпуклое и замкнутое подмножество $\mathbb{R}^n$, $X_*$ --- компакт и $\|\cdot\|_2$ --- евклидова норма. 
+    При таком допущении удается предложить субградиентный метод с гарантией  линейной скорости сходимости в случае доступности информации о точном значении $f^*$ \cite{6} без использования с теоретических оценках скорости сходимости  параметра размерности пространства. Условие острого минимума верно, например, для задачи проектирования точки на выпуклый компакт. Однако требование доступности $f^*$ довольно ограничительно. В этой связи в настоящей работе рассмотрено некоторое обобщение условия острого минимума
+    \begin{gather}\label{eq_gen_sharp}
+    f(x) - \overline{f} \geq \alpha \min_{x_* \in X_*} \|x - x_* \|_2 - \Delta,
+    \end{gather}
+    где $\overline{f}$  --- это некоторое приближение минимального значения функции $f^*$, причём $\overline{f} \geq f^*$. Оказалось, что такое обобщение позволяет несколько расширить класс применимости субградиентных методов для задач с острым минимумом и шагом Б.Т. Поляка. Например, оно может покрыть постановку задачи с неточной информацией о $f^*$. При этом в работе выводятся оценки качества выдаваемого решения субградиентным методом с <<неточным>> аналогом шага Б.Т. Поляка на задачи с неизвестной константой Липшица целевой функции. Такой подход, связанный с использованием в теоретических результатах локальных аналогов глобальных характеристик целевой функции (в данном случае константа Липшица $f$) позволяет применять полученные результаты и к более широким классам задач с необязательно липшицевыми целевыми функциями. 
+
+    В настоящей статье показана возможность применения предложенного подхода к сильно выпуклым негладким задачам (вообще говоря, не обладающим острым минимумом) и выполнено экспериментальное сравнение с известным оптимальным субградиентным методом на таком классе задач. Более того, получены результаты о применимости предложенной методики для некоторых типов задач с релаксациями выпуклости: недавно предложенное условие слабой $\beta$-квазивыпуклости \cite{7} или обычное условие квазивыпуклости (унимодальности). Такаже исследовано обобщение указанной методики на ситуацию с предположением о доступности на итерациях $\delta$-субградиента целевой функции вместо обычного субградиента. Для одного из рассмотренных методов найдены условия, при которых на практике можно отказаться от проектирования на допустимое множество поставленной задачи.
+
+    Итак, в работе рассмотрен класс задач
+    \begin{gather}\label{eq_1}
+    f(x)\rightarrow\min_{x\in Q},
+    \end{gather}
+    где $f$ --- непрерывная и выпуклая, или квазивыпуклая (унимодальная), или слабо $\beta$-квазивыпуклая при некотором $\beta\in (0;1]$ функция (понятие слабой $\beta$-квазивыпуклости введено недавно в \cite{7}). Для задач вида \eqref{eq_1} c предположением типа \eqref{eq_gen_sharp} в настоящей работе исследованы некоторые вариации субградиентного метода с шагом Б.Т. Поляка.
+
+    Данная статья состоит из введения, заключения и 6 основных разделов. В разделе 2 вводится аналог острого минимума (понятие $\Delta$-острого минимума) и рассматриваются примеры задач для которых это условие заведомо выполнено (примеры \ref{example1} --- \ref{example3}). При этом может не выполняться условие обычного острого минимума. В разделе 3 исследован адаптивный субградиентный метод на классе задач слабо $\beta$-квазивыпуклых функций, допускающих $\Delta$-острый минимум. В разделе 4 рассмотрен частично адаптивный субградиентный метод на классе квазивыпуклых функций в случае острого минимума, а также в случае $\Delta$-острого минимума. Получены оценки скорости сходимости рассматриваемых методов (теоремы \ref{theorem1} --- \ref{theorem4}), также исследовано поведение траектории субградиентного метода с целью получения возможности использовать метод без операции проектирования на допустимое множество. Получена оценка, описывающая удаление  траектории метода от начальной точки (теорема \ref{theorem5}). В разделе 5 исследуется аналог предложенного в разделе 4 метода на классе выпуклых липшицевых функций с использованием на итерациях $\delta$-субградиентов вместо обычных субградиентов. Использование $\delta$-субградиентов потенциально может позволить сэкономить вычислительные затраты метода за счёт отказа от требования доступности точного значения субградиента целевой функции в текущей точке. При этом доказано, что в оценке качества выдаваемого решения не накапливаются величины, соответствующие $\delta > 0$ (теорема \ref{theorem7}). В разделе 6 описаны вычислительные эксперименты по демонстрации эффективности и сравнению предложенной в разделе 3 методики для задач с $\Delta$-острым минимумом с работой известного субградиентного метода \cite{Bach_2012} для некоторых сильно выпуклых задач (выбор этого типа задач для сравнения обусловлен тем, что для них известны применимые на практике оценки качества решения по аргументу). Попутно также выведена адаптивная оценка качества выдаваемого субградиентным методом \cite{Bach_2012} решения. В разделе 7 на классе сильно выпуклых задач описана оценка качества решения субградиентного метода \cite{Bach_2012} с использованием адаптивно подбираемых параметров и для задачи о наименьшем покрывающем шаре описаны результаты экспериментов по сравнению эффективности предложеных в настоящей работе методов с шагом типа Б.Т. Поляка и субградиентного метода типа \cite{Bach_2012}.
+
+\section{Адаптивная оценка скорости сходимости одного субградиентного метода для сильно выпуклых задач и вычислительные эсперименты для задачи о наименьшем покрывающем шаре}  \label{sec:ch3/sec2}
+
+    Теперь перейдём к экспериментальному сравнению работы предложенных в разделе 3 подходов для задач с $\Delta$-острым минимумом с работой известного субградиентного метода \cite{Bach_2012} для некоторых сильно выпуклых задач. Выбор класса сильно выпуклых задач и метода \cite{Bach_2012} для сравнения обусловлен известными и  применимыми на практике теоретическими оценками качества приближённого решения по аргументу. Отметим адаптивный аналог \cite{Stonyakin_2021} теоретической оценки качества выдаваемого решения для субградиентного метода \cite{Bach_2012}. Напомним, что в работе рассматриваются задачи вида
+    \begin{gather}\label{min_q}
+        f(x)\rightarrow\min_{x\in Q},
+    \end{gather}
+    где $Q$ --- выпуклое замкнутое подмножество $\mathbb{R}^{n}$. Для субградиентного метода вида
+    \begin{gather}\label{orig}
+        x_{k+1} := Pr_{Q}\{x_k - h_k \nabla f(x_k) \}, \;\; \textit{где} \; h_k = \frac{2}{\mu (k+1)}
+    \end{gather}
+    известна следующая оценка скорости сходимости \cite{Bach_2012}:
+    \begin{equation}\label{orig_estimation_f}
+        f(\widehat{x}) - f(x_*) \leq \frac{2 M^2}{\mu (N+1)}  \; \text{  при   } \; \widehat{x} = \sum\limits_{k=1}^{N} \frac{2 k}{N (N+1)} x_k, 
     \end{equation}
-    где $\{ h_k \}$ - последовательность размеров шагов.
-    Для него справедлива следующая оценка скорости сходимости:
-    \begin{equation} \label{general_est}
-        \min_{0\leq k \leq N} f(x_k) - f(x) \leq \frac{\frac{1}{2} M^2 \sum_{k=0}^N h_k^2 + V(x, x_0)}{\sum_{k=0}^N h_k}
+    где $M$ --- константа Липщица целевой функции $f$.
+
+    Оказывается, что данную оценку можно несколько улучшить на классе сильно выпуклых задач \cite{Stonyakin_2021}. Для доказательства понадобится следующая вспомогательная лемма. 
+    \begin{lemma}\label{lemma_adapt}
+        Если $x_k$ и $x_{k+1}$ удовлетворяют \eqref{orig}, то для произвольного $x \in Q$ верно неравенство
+        $$
+            h_k \langle \nabla f(x_k), x_k - x \rangle \leq \frac{h^2_k \|\nabla f(x_k)\|^2_2}{2} + \frac{1}{2}\| x - x_k\|^2_2 - \frac{1}{2}\| x -x_{k+1}\|^2_2.
+        $$
+    \end{lemma}
+    \begin{proof}
+        Непосредственно проверяются следующие неравенства:
+        \begin{gather*}
+          \begin{aligned}
+            h_k \langle \nabla f(x_k), x_k - x \rangle \leq h_k \langle \nabla f(x_k), x_k - x_{k+1} \rangle & + \frac{1}{2}\| x - x_k\|^2_2 -  \frac{1}{2}\| x - x_{k+1}\|^2_2 - \\
+                - \frac{1}{2}\| x_{k+1} - x_k\|^2_2 \leq \\
+            \leq h_k \|\nabla f(x_k)\|_2 \| x_{k+1} - x_{k} \|_2 + \frac{1}{2}\| x - x_k\|^2_2 -  &\frac{1}{2}\| x -x_{k+1}\|^2_2 - \frac{1}{2}\| x_{k+1} -x_k\|^2_2 \leq \\ 
+            \leq \frac{h^2_k \|\nabla f(x_k)\|^2_2}{2} + \frac{1}{2}\| x - x_k\|^2_2& -  \frac{1}{2}\| x - x_{k+1}\|^2_2.
+          \end{aligned}
+        \end{gather*}
+    \end{proof}
+    Согласно лемме \ref{lemma_adapt} получим, что для всяких $k \geq 0$ и $x \in Q$: 
+    $$
+        \langle \nabla f(x_k), x_k - x \rangle \leq \frac{h_k \|\nabla f(x_k)\|^2_2}{2} + \frac{1}{2 h_k}\| x - x_k\|^2_2 - \frac{1}{2 h_k}\| x -x_{k+1}\|^2_2.
+    $$
+    Далее, с учетом $\mu$-сильной выпуклости $f$:
+    $$
+        f(x_k) - f(x)  + \frac{\mu}{2}\|x_k - x \|^2_2 \leq \langle \nabla f(x_k), x_k - x \rangle \;\; \forall x \in Q,
+    $$
+    откуда при всяком $k \geq 0$:
+    \begin{gather*}
+      \begin{aligned}
+        2k f(x_k) - 2k f(x) + k\mu\|x - x_k \|^2_2 \leq \frac{2k\|\nabla f(x_k)\|^2_2}{\mu(k+1)} + k(k+1)\frac{\mu}{2}\|x - x_k\|^2_2 -\\
+        - k(k+1)\frac{\mu}{2}\|x - x_{k+1}\|^2_2.
+      \end{aligned}
+    \end{gather*}
+
+    Пусть алгоритм \eqref{orig} отработал $N$ шагов. Тогда можно просуммировать неравенства по $k$ от 1 до $N$ и учесть, что $\frac{k}{k+1} \leq 1$:
+    $$
+        \sum_{k=1}^{N} 2k(f(x_k) - f(x) + \frac{\mu}{2} \| x_k - x \|^2_2) \leq \frac{2N\|\nabla f(x_k)\|^2_2}{\mu},
+    $$
+    откуда с учетом $2(1 + 2 +...+ N) = N(N + 1)$ получаем:
+    $$
+        \sum_{k=1}^{N} \frac{2k}{N(N + 1)} (f(x_k) - f(x) + \frac{\mu}{2} \| x_k - x \|^2_2) \leq \frac{2\|\nabla f(x_k)\|^2_2}{\mu(N + 1)}.
+    $$
+
+    Ввиду выпуклости теперь $f$ верно неравенство
+    $$
+         f(\widehat{x}) - f(x) \leq \frac{2}{\mu N (N + 1)} \sum_{k=1}^{N} \frac{k \| \nabla f(x_k)\|^2_2}{k + 1} \leq \varepsilon
+    $$
+    после $N = \mathcal{O}(\frac{M^2}{\mu\varepsilon})$ итераций алгоритма \eqref{orig}. Поэтому справедлива следующая
+    \begin{theorem}\label{ThmBachAdaptive}
+        Пусть $f$ --- $\mu$-сильно выпуклая функция. Тогда после $N$ итераций алгоритма:
+        $$
+            x_{k+1} := Pr_{Q}\{x_k - h_k \nabla f(x_k) \}, \;\; \textit{где} \; h_k = \frac{2}{\mu (k+1)}
+        $$
+        будет верно неравенство:
+        \begin{equation}\label{adaptive_estimation_f}
+            f(\widehat{x}) - f(x_*) \leq \frac{2}{\mu N (N+1)} \sum_{k=1}^{N} \frac{k \|\nabla f(x_k)\|_2^2}{k+1},
+        \end{equation}
+        где
+        $$
+            \widehat{x} = \sum_{k=1}^{N} \frac{2 k}{N (N+1)} x_k.
+        $$
+        Если $f$ ещё и $M$-липшицева при $M >0$, то
+        $$
+             f(\widehat{x}) - f(x) \leq \varepsilon
+        $$
+        после $N = \mathcal{O}(\frac{M^2}{\mu\varepsilon})$ итераций алгоритма \eqref{orig}.
+    \end{theorem}
+
+    Отметим, что если $x_*$ --- точное решение задачи минимизации $f$, то можно получить оценку скорости сходимости по аргументу вида
+    \begin{equation} \label{arg_est}
+        \|\widehat{x} - x_*\|_2 \leq \frac{4}{\mu N (N+1)} \sum_{k=1}^{N} \frac{k \|\nabla f(x_k)\|_2^2}{k+1} \leq \frac{4M^2}{\mu(N+1)}.
     \end{equation}
-\end{theorem}
+
+    Полученный в теореме \ref{ThmBachAdaptive} результат применим и в случаях, когда константа Липщица ($M$) --- бесконечна или её значение сложно оценить. Более того, данный подход может быть распространён на важные прикладные задачи, среди которых задача бинарной классификации методом опорных векторов (SVM) \cite{Bach_2012}. По аналогии с работой \cite{Bach_2012} можно применять стохастический вариант зеркального спуска \eqref{orig}. Также отметим, что данные рассуждения и метод могут быть обобщены на класс вариационных неравенств, лагранжевых и седловых задач \cite{Stonyakin_2021}. 
+
+    Для сравнения скорости сходимости метода \cite{Bach_2012} и полученной в теореме \ref{ThmBachAdaptive} оценки с предложенными в настоящей работе (раздел 3) вариациями субградиентных методов для задач с $\Delta$-острым минимумом проведены численные эксперименты для задачи о наименьшем покрытии точек шаром для $2$-сильно выпуклой функции
+    \begin{gather}\label{sphere_cover_strongly}
+        f(x) := \max_{x\in Q}\left\{\|x - a_0\|_2^2, \|x - a_1\|_2^2, ..., \|x - a_m\|_2^2\right\},
+    \end{gather}
+    а также для не сильно выпуклой (но выпуклой) функции
+    \begin{gather}\label{sphere_cover}
+        f(x) := \max_{x\in Q}\left\{\|x - a_0\|_2, \|x - a_1\|_2, ..., \|x - a_m\|_2\right\}.
+    \end{gather}
+
+    Начнём с иллюстрации преимуществ адаптивной оценки метода \cite{Bach_2012} из теоремы \ref{ThmBachAdaptive}. Будем рассматривать множество Q, которое равно евклидову шару с центром в 0. Начальная точка выбиралась случайно, но внутри Q. На рис. \ref{res_ex_strong_r5} и \ref{res_ex_strong_unlim} ниже показано поведение и характер убывания для оригинальной оценки (\ref{orig_estimation_f}) --- сплошная линия, адаптивной оценки (\ref{adaptive_estimation_f}) --- штрих-пунктирная линия и непосредственно невязки по функции и по аргументу соответственно --- штриховая линия. На рис. \ref{res_ex_strong_r5} показано поведение глобальной оценки, адаптивной и невязки по функции и аргументу в случае ограниченного $Q (R = 5)$. Случай, когда глобальной оценкой воспользоваться не получится, показан на рис. \ref{res_ex_strong_unlim}. В этом случае мы работаем на $Q = \mathbb{R}^n$, потому наблюдаем соотношение между адаптивной оценкой и непосредственно невязкой. Данные графики наглядно демонстрируют, насколько более точной может оказаться адаптивная оценка (\ref{adaptive_estimation_f}) для задачи \eqref{sphere_cover_strongly}. 
+
+    \begin{figure}[h]
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{x_discr_rad_5_q_4_it_70_000_dim_1000.png}
+        \endminipage\hfill
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{f_discr_rad_5_q_4_it_70_000_dim_1000.png}
+        \endminipage\hfill
+        \caption{Результаты решения задачи минимизации \eqref{sphere_cover_strongly}, где  $n= 1\,000, r = 5$ и  шар $Q$ радиуса 4.}
+        \label{res_ex_strong_r5}
+    \end{figure}
+
+    \begin{figure}[h]
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{x_discr_unlim_q.png}
+        \endminipage\hfill
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{f_discr_unlim_q.png}
+        \endminipage\hfill
+        \caption{ Результаты решения задачи минимизации \ref{sphere_cover_strongly}, где  $n= 1\,000, r = 5$ и  $Q = \mathbb{R}^n$.}
+        \label{res_ex_strong_unlim}
+    \end{figure}
+
+    Теперь перейдём к выпуклой постановке \eqref{sphere_cover} с целью исследования эффективности предложенных в разделе 3 субградиентных методов с $\Delta$-острым мнимимумом. К существующему набору точек, представленных для покрытия, с известным значением центра добавим дополнительную точку, которая находится вне исходного шара достаточно близко к границе (удалена не более, чем на $\Delta > 0$). Данный подход позволяет оценить <<приближённое>> значение минимума $\overline{f}$, что позволит применить разработанные выше варианты субградиентного метода с $\Delta$-острым минимумом. При этом новое значение минимума останется внутри исходной сферы. Поскольку оптимальное значение функции --- это радиус искомого шара, покрывающего все точки, а $x_*$ всегда будет расположена внутри него, то для всякого $x$ верно неравенство $ f(x) \geq \| x - x_*\|_2$. Рассмотрим целевую функцию вида
+    \begin{gather}\label{allpha_sphere_cover}
+        f(x) := \alpha \max_{x\in Q}\{\|x - a_0\|_2, \|x - a_1\|_2, ..., \|x - a_m\|_2\}.
+    \end{gather}
+    Тогда значение $\Delta$ можно оценить  из (\ref{eq_gen_sharp}): 
+        $f(x) - \overline{f} \geq \alpha\|x- x_*\|_2 - \Delta, \quad \Delta \geq \overline{f}$.
+
+    Отметим, что данная постановка значительно влияет на величину теоретической оценки качества решения (\ref{adaptive_estimate}) для метода \eqref{1}.
+    Наиболее значимый вклад в оценку (\ref{adaptive_estimate}) дает последнее слагаемое $\frac{\Delta^2}{2\|\nabla f(x_k)\|^2_2}$, причём 
+    $     \Delta \sim \overline{f} \sim \alpha \|\overline{x}-a\|_2 $ и 
+    $     \|\nabla f(x_k)\|_2 = \alpha $. Поэтому последнее слагаемое пропорционально радиусу шара, соответсвующему <<приближённому>> решению. Это и подтверждается экспериментально. Для сравнения, ниже на рис. \ref{res_sharp_convex} и \ref{res_strong_convex} приведены результаты работы для того же набора входных точек, которые необходимо покрыть в обоих постановках --- (\ref{allpha_sphere_cover}) и (\ref{sphere_cover_strongly}). Начальная точка также одна и та же. Сравниваются методы \eqref{1} и \eqref{orig}. Первый из этих методов обеспечивает сходимость буквально за 10 итераций к <<приближённому>> решению с заданной точностью и даже позволяет эту точность повысить. Второй же метод достигает схожих (с геометрической точки зрения) результатов за значительно большее количество итераций, однако он позволяет повышать точность приближённого решения на дальнейших итерациях.
+
+    Подтверждение данного теоретического наблюдения хорошо иллюстрируется на рис. \ref{res_sharp_convex} и \ref{res_strong_convex}. На рис. \ref{res_sharp_convex} показано поведение субградиентного спуска, использующего $\Delta$-острый минимум (теорема \ref{theorem4}), а именно --- быстрая сходимость к <<приближенному>> решению. Штрих-пунктирная линия соответствует оценке \eqref{eq_gen_sharp}, а штриховая --- невязке по функции и аргументу. На рис. \ref{res_strong_convex} показано поведение метода для той же задачи, но с использованием сильно выпуклого целевого функционала (теорема \ref{ThmBachAdaptive}). Скорость убывания уже не столь высокая, но точность получаемого решения в итоге выше. Сплошная линия --- это глобальная оценка \eqref{orig_estimation_f}, штрих-пунктирная --- адаптивная \eqref{adaptive_estimation_f}, а штриховая --- невязка по функции и аргументу.
+
+    \begin{figure}[h]
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{sharp_convex_x.png}
+        \endminipage\hfill
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{sharp_convex_f.png}
+        \endminipage\hfill
+        \caption{ Результаты решения задачи минимизации (\ref{allpha_sphere_cover}), где  $n= 1\,000, r = 0.7525, \alpha = 0.6$.}
+        \label{res_sharp_convex}
+    \end{figure}
+
+    \begin{figure}[h]
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{strong_convex_small_rad_x.png}
+        \endminipage\hfill
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{strong_convex_small_rad_f.png}
+        \endminipage\hfill
+        \caption{ Результаты решения задачи минимизации (\ref{sphere_cover_strongly}), где  $n= 1\,000, r = 0.7525$.}
+        \label{res_strong_convex}
+    \end{figure}
+
+    Тем не менее, сравнение с известным точным решением $x_*$, а также график динамики значения целевой функции показывает, что за малое число шагов (значительно меньшее, чем для метода \eqref{orig}) реализация метода \eqref{1} приводит к неплохому качеству приближённого решения. При этом, однако, для метода \eqref{1} после достижения такого уровня дальнейшее повышение качества выходной точки в отличие от метода \eqref{orig} уже не наблюдается.
 
 
-\begin{remark}
-    Если в \ref{vanilla_mirror} выбрать шаг следующим образом:
-    \begin{equation} \label{mirr_step}
-        h_{k} = \frac{\sqrt{2 V(x_*, x_0)}}{M\sqrt{N}},
-    \end{equation}
-    то скорость сходимости можно оценить так:
-    \begin{equation} \label{mirr_est}
-        f(\widehat{x_N}) - f(x_*) \leq \frac{M\sqrt{2V(x_*, x_0)}}{\sqrt{N}}
-    \end{equation}
-\end{remark}
-Если функция обладает дополнительными свойствами, аналогичными <<острому минимуму>>,  то становится возможным применение техники рестартов. Один из возможных аналогов - условие $\gamma$-роста:
+\section{Рестартованный метод зеркального спуска для относительных липшицевых задач оптимизации с относительным гамма-ростом}\label{sec:ch3/sect3}
 
-\begin{definition} \label{gamma-growth}
-   $f$ --- удовлетворяет условию $\gamma$-роста тогда и только тогда:
-   \begin{equation}
-       f(x) - f(x_*) \geq \mu_{\gamma}(V(x_*,x))^{\gamma/2}
-   \end{equation}
-\end{definition}
+    \begin{theorem} \label{vanilla_mirror}
+        Пусть $f$ --- является $M$-липщицевой на $Q$ относительно некоторой функции Брегмана $V_d(x, y)$ c 1-сильно выпуклой прокс-функцией $d(x)$. Тогда можно задать метод следующим образом:
+        \begin{equation} \label{mirr_upd}
+            x_{k+1} = \arg \min_{x \in Q} {f(x_k) + \langle g(x_k), x - x_k \rangle + \frac{1}{h_k} V_d(x, x_k)},
+        \end{equation}
+        где $\{ h_k \}$ - последовательность размеров шагов.
+        Для него справедлива следующая оценка скорости сходимости:
+        \begin{equation} \label{general_est}
+            \min_{0\leq k \leq N} f(x_k) - f(x) \leq \frac{\frac{1}{2} M^2 \sum_{k=0}^N h_k^2 + V(x, x_0)}{\sum_{k=0}^N h_k}
+        \end{equation}
+    \end{theorem}
 
-\begin{theorem}
-    Пусть $f$ --- удовлетворяет условию $\gamma$-роста (\ref{gamma-growth}) и также является $M$-липщицевой на $Q$ относительно некоторой функции Брегмана $V_d(x, y)$. В таком случае Алгоритм \ref{alg:rest_gamma} достигнет точности $\epsilon$ не более чем за:
-    \begin{equation}
-       N = \frac{M^2 2^{\gamma}(1 - V(x_*, x_0^0)^{1 - \gamma}) }{\mu_{\gamma}^2 \varepsilon^{(\gamma-1)} (2^{(\gamma-1)} - 1)} = \frac{M^2}{\mu_{\gamma}^2 (\frac{1}{2} - \frac{1}{2^\gamma}) \varepsilon^{(\gamma-1)} } (1 - \frac{1} {V(x_*, x_0^0)^{(\gamma - 1)}})
-    \end{equation}
-    причем будут справедливы неравенства:
-    \begin{equation}
-       V(x_*, \widehat{x_p}) \leq \varepsilon
-    \end{equation}
-    и
-    \begin{equation}
-        f(\widehat{x_p}) - f(x_*) \leq  \langle g(\widehat{x_p}), \widehat{x_p} - x_* \rangle \leq M \sqrt{ 2 V(x_*, \widehat{x_p})} \leq M \sqrt{2 \varepsilon}  
-    \end{equation}
-\end{theorem}
 
-\begin{algorithm}[htp]
-    \caption{Рестарты зеркального спуска при условии $\gamma$-роста.}
-    \label{alg:rest_gamma}
-    \KwData{$\varepsilon > 0$}
-    \KwResult{$x_p$}
-    $p \gets 0$\;
-    $V(x_*, x_0) \gets V(x_*,x_0^0)$\;
-    \While{$p > \log_2\left(\frac{V(x_*, x_0^0)}{\varepsilon}\right).$}{
-        $x_{p}$ --- результат работы метода \ref{mirr_upd} с шагом \ref{mirr_step} и количеством шагов $N_{p} = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{p(1 - \gamma)}} V(x_*, x_0^0)^{1 - \gamma}$\;
-        $x_0 = \widehat{x_p}$\;
-        $V(x_*, x_0) \gets \frac{1}{2^{p+1}}V_{0}(x_*, x_0^0)$\;
-        $p=p+1$\;
-    }
-\end{algorithm}
+    \begin{remark}
+        Если в \ref{vanilla_mirror} выбрать шаг следующим образом:
+        \begin{equation} \label{mirr_step}
+            h_{k} = \frac{\sqrt{2 V(x_*, x_0)}}{M\sqrt{N}},
+        \end{equation}
+        то скорость сходимости можно оценить так:
+        \begin{equation} \label{mirr_est}
+            f(\widehat{x_N}) - f(x_*) \leq \frac{M\sqrt{2V(x_*, x_0)}}{\sqrt{N}}
+        \end{equation}
+    \end{remark}
+    Если функция обладает дополнительными свойствами, аналогичными <<острому минимуму>>,  то становится возможным применение техники рестартов. Один из возможных аналогов - условие $\gamma$-роста:
 
-\begin{proof}
-   Объединим в систему свойство \ref{gamma-growth} и оценку \ref{mirr_est}. В доказательстве используется обозначение $x_m^n$, где $m - 0...N$ соответсвует номеру итерации и $n - 0...p$ соответсвует номеру рестарта: 
-   $$
-       \mu_{\gamma}(V(x_*, \widehat{x_N^0}))^{\frac{\gamma}{2}} \leq f(\widehat{x_N^0}) - f(x_*) \leq \frac{M\sqrt{V(x_*, x_0^0)}}{\sqrt{N}}
-   $$
-   $$
-       \mu_{\gamma}(V(x_*, \widehat{x_N^0}))^{\frac{\gamma}{2}} \leq \frac{M\sqrt{V(x_*, x_0^0)}}{\sqrt{N}}
-   $$
-   $$
-       (V(x_*, \widehat{x_N^0}))^{\frac{\gamma}{2}} \leq \frac{M\sqrt{V(x_*, x_0^0)}}{\mu_{\gamma}\sqrt{N}}
-   $$
-   $$
-       V(x_*, \widehat{x_N^0}) \leq (\frac{M}{\mu_{\gamma}\sqrt{ N}})^{\frac{2}{\gamma}} (V(x_*, x_0^0))^{\frac{1}{\gamma}}
-   $$
-   $$
-       V(x_*, \widehat{x_N^0}) \leq V(x_*, x_0^0) (\frac{M}{\mu_{\gamma}\sqrt{N}})^{\frac{2}{\gamma}} (V(x_*, x_0^0))^{\frac{1}{\gamma} - 1}
-   $$
-   Теперь можно оценить необходимое количество итераций для 0 запуска:
-   $$
-       (\frac{M}{\mu_{\gamma}\sqrt{N}})^{\frac{2}{\gamma}} (V(x_*, x_0^0))^{\frac{1}{\gamma} - 1} \leq \frac{1}{2} 
-   $$
-   $$
-       (\frac{M}{\mu_{\gamma}})^{\frac{2}{\gamma}} (V(x_*, x_0^0))^{\frac{1}{\gamma} - 1} \leq \frac{1}{2} N^{\frac{1}{\gamma}} 
-   $$
-   $$
-       (\frac{M}{\mu_{\gamma}})^{\frac{2}{\gamma}} (V(x_*, x_0^0))^{\frac{1}{\gamma} - 1} \leq \frac{1}{2} N^{\frac{1}{\gamma}} 
-   $$
-   $$
-       \frac{1}{2} N^{\frac{1}{\gamma}} \geq (\frac{M}{\mu_{\gamma}})^{\frac{2}{\gamma}} (V(x_*, x_0^0))^{\frac{1}{\gamma} - 1}  
-   $$
-   $$
-       N \geq 2 ^ {\gamma} \frac{M^2}{\mu_{\gamma}^2} (V(x_*, x_0^0))^{1 - \gamma}  
-   $$
-   $$
-       N \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, x_0^0))^{1 - \gamma}  
-   $$
-   Проверим поведение для нескольких последующих рестартов. Для 1-го запуска $x_0^1 = \widehat{x_N^0}$:
-   $$
-       V(x_*, \widehat{x_N^1}) \leq \frac{1}{2} V(x_*, x_0^1) = \frac{1}{2} V(x_*, \widehat{x_N^0}) \leq (\frac{1}{2})^2 V(x_*, x_0^0) 
-   $$
-   после:
-   $$
-       N_1 \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, x_0^1))^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, \widehat{x_N^0}))^{1 - \gamma} 
-   $$
-   при $\gamma > 1$:
-   $$
-       V(x_*, \widehat{x_N^0}) \leq \frac{1}{2}V(x_*, x_0^0)  
-   $$
-   $$
-       (V(x_*, \widehat{x_N^0}))^{\gamma - 1} \leq (\frac{1}{2} V(x_*, x_0^0))^{\gamma - 1}
-   $$
-   $$
-        (\frac{1}{2} V(x_*, x_0^0))^{1 - \gamma} \leq (V(x_*, \widehat{x_N^0}))^{1 - \gamma}
-   $$
-   соответсвенно:
-   $$
-       N_1 \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, \widehat{x_N^0}))^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (\frac{1}{2} V(x_*, x_0^0))^{1 - \gamma} = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{1-\gamma}} (V(x_*, x_0^0))^{1 - \gamma}
-   $$
-   Для 2-го запуска $x_0^2 = \widehat{x_N^1}$:
-   $$
-       V(x_*, \widehat{x_N^2}) \leq \frac{1}{2} V(x_*, x_0^2) \leq (\frac{1}{2})^3 V(x_*, x_0^0) 
-   $$
-   после:
-   $$
-       N_2 \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, x_0^2))^{1 - \gamma} = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, \widehat{x_N^1}))^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{1 - \gamma}} (V(x_*, x_0^1))^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{2(1 - \gamma)}} (V(x_*, x_0^0))^{1 - \gamma} 
-   $$
-   Для $(p-1)$-го запуска:
-   \begin{equation} \label{v_seq}
-       V(x_*, \widehat{x_N^{p-1}}) \leq \frac{1}{2^p} V(x_*, x_0^0)
-   \end{equation}
-   после:
-   \begin{equation} \label{n_seq}
-       N_{p-1} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{(p - 1)(1 - \gamma)}} (V(x_*, x_0^0))^{1 - \gamma}
-   \end{equation}
-   Используя найденную зависимость \ref{v_seq}, проведем оценку общего числа обращений к оракулу (здесь предполагается, что $\gamma > 1$ - равенство рассмотрим далее):
-   $$
-       \sum_{k=1}^{p - 1} N_k \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, x_0^0))^{1 - \gamma} (1 + 2^{(\gamma-1)} + 2^{2(\gamma - 1)} + ... + 2^{(p-1)(\gamma - 1)}) = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \frac{1 - 2^{(p-1)(\gamma-1)}}{1 - 2^{(\gamma-1)}} (V(x_*, x_0^0))^{1 - \gamma}
-   $$
-   Если задать ограничение для $V(x_*, \widehat{x_N^{p-1}})$:
-   $$
-       V(x_*, \widehat{x_N^{p-1}}) \leq \frac{1}{2^p} V(x_*, x_0^0) \leq \varepsilon
-   $$
-   $$
-        2^p \geq \frac{1}{\varepsilon} V(x_*, x_0^0)
-   $$
-   Откуда получаем оценку для количества рестартов:
-   \begin{equation}
-        p \geq \log_2{\frac{V(x_*, x_0^0)}{\varepsilon}}
-   \end{equation}
-   Используем это для оценки общего количества обращений к <<оракулу>>:
-   $$
-       \sum_{k=1}^{p} N_k \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \frac{1 - 2^{p(\gamma-1)}}{1 - 2^{(\gamma-1)}} (V(x_*, x_0^0))^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 (1 - 2^{(\gamma-1)})} (1 - \frac{V(x_*, x_0^0)^{(\gamma-1)}}{\varepsilon^{(\gamma-1)}}) (V(x_*, x_0^0))^{1 - \gamma} =
-   $$
-   $$
-       = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 (2^{(\gamma-1)} - 1)} (\frac{V(x_*, x_0^0)^{(\gamma-1)}}{\varepsilon^{(\gamma-1)}} - 1) (V(x_*, x_0^0))^{1 - \gamma} = \frac{M^2 2^{\gamma}(1 - V(x_*, x_0^0)^{1 - \gamma}) }{\mu_{\gamma}^2 \varepsilon^{(\gamma-1)} (2^{(\gamma-1)} - 1)} = 
-   $$
-   $$
-       = \frac{M^2}{\mu_{\gamma}^2 (\frac{1}{2} - \frac{1}{2^\gamma}) \varepsilon^{(\gamma-1)} } (1 - \frac{1} {V(x_*, x_0^0)^{(\gamma - 1)}}) \geq \frac{2 M^2}{\mu_{\gamma}^2 \varepsilon^{(\gamma-1)} } (1 - \frac{1} {V(x_*, x_0^0)^{(\gamma - 1)}}) 
-   $$
-   Отдельно рассмотрим случай, когда $\gamma = 1$:
-   $$
-       \sum_{k=1}^{p} N_k = \frac{2 p M^2}{\mu_{\gamma}^2} \geq \frac{2 M^2}{\mu_{\gamma}^2} \log_2{\frac{V(x_*, x_0^0)}{\varepsilon}}
-   $$
-   Таким образом получаем оценки:
-   $$
-       \mathcal{O} (\frac{2 M^2}{\mu_{\gamma}^2} \log_2{\frac{V(x_*, x_0^0)}{\varepsilon}}) \text{ при } \gamma = 1
-   $$
-   $$
-       \mathcal{O} (\frac{M^2}{\mu_{\gamma}^2 (\frac{1}{2} - \frac{1}{2^\gamma}) \varepsilon^{(\gamma-1)} } (1 - \frac{1} {V(x_*, x_0^0)^{(\gamma - 1)}})) = \mathcal{O} (\frac{2 M^2}{\mu_{\gamma}^2 \varepsilon^{(\gamma-1)} } (1 - \frac{1} {V(x_*, x_0^0)^{(\gamma - 1)}})) \text{ при } \gamma > 1
-   $$
-\end{proof}
-
-\begin{theorem}
-    Пусть $f$ --- удовлетворяет условию $\gamma$-роста (\ref{gamma-growth}) и также является $M$-липщицевой на $Q$ относительно некоторой функции Брегмана $V_d(x, y)$. В таком случае Алгоритм \ref{alg:rest_gamma} достигнет точности $\delta$ не более чем за:
-    \begin{equation}
-       N = \frac{M^{2\gamma} 2^{(2\gamma - 1)}(1 - V(x_*, x_0^0)^{1 - \gamma}) }{\mu_{\gamma}^2 \delta^{(2\gamma - 2)} (2^{(\gamma-1)} - 1)}
-    \end{equation}
-    причем будут справедливы неравенства:
-    \begin{equation}
-       f(\widehat{x_p}) - f(x_*)  \leq \delta 
-    \end{equation}
-    и
-    \begin{equation}
-       V(x_*, \widehat{x_p}) \leq \frac{\delta^2}{2 M^2}
-    \end{equation}
-\end{theorem}
-Для дальнейших рассуждений необходим адаптивный аналог оценки \eqref{general_est}. Понадобится вспомогательная лемма:
-\begin{lemma}\label{th:base}
-   Если для $g$ верно \eqref{rel_bound}, а $x_k$ и $x_{k+1}$ удовлетворяют \eqref{eq:4}, то для произвольного $x \in Q$ верно неравенство
-   \begin{equation} \label{base_eq}
-       h_k \langle g(x_k), x_k - x \rangle \leq \frac{h_k^2}{2} \norm{g(x_k)}^2 + V(x, x_k) - V(x, x_{k+1}).
-   \end{equation}
-\end{lemma}
-
-\begin{proof}
-   Непосредственно проверим следующие неравенства:
-   $$
-       h_k \langle g(x_k), x_k - x \rangle \leq h_k \langle g(x_k), x_k - x_{k+1} \rangle + V(x, x_k) - V(x, x_{k+1}) - V(x_{k+1}, x_k) \leq 
-   $$
-   $$
-       \leq h_k \norm{g(x_k)}_* \norm{x_k - x_{k+1}}_* + V(x, x_k) - V(x, x_{k+1}) - V(x_{k+1}, x_k) \leq 
-   $$
-   $$
-       \leq h_k \norm{g(x_k)}_* \sqrt{2V(x_{k+1}, x_k)} + V(x, x_k) - V(x, x_{k+1}) - V(x_{k+1}, x_k) \leq \frac{h_k^2}{2} \norm{g(x_k)}^2 + V(x, x_k) - V(x, x_{k+1}) 
-   $$
-\end{proof}
-
-\begin{remark} \label{adapt_mirror}
-    Для теоремы \ref{vanilla_mirror} можно уточнить полученную оценку: 
-    \begin{equation} \label{adapt_est}
-        \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{g(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{V(x_*, x_0) }{\sum_{k=0}^N h_k}
-    \end{equation}
-\end{remark}
-
-\begin{proof}
-   Пусть алгоритм \ref{mirr_upd} отработал $N$ шагов, тогда просуммируем неравенства \eqref{base_eq}:
-   $$
-       h_k (f(x_k) - f(x_*)) \leq h_k \langle g(x_k), x_k - x_* \rangle \leq \frac{h_k^2}{2} \norm{g(x_k)}^2 + V(x_*, x_k) - V(x_*, x_{k+1})
-   $$
-   $$
-       \sum_{k=0}^N h_k (f(x_k) - f(x_*)) \leq \sum_{k=0}^N \frac{h_k^2}{2} \norm{g(x_k)}^2 + \sum_{k=0}^N (V(x_*, x_k) - V(x_*, x_{k+1}))
-   $$
-   $$
-       \frac{\sum_{k=0}^N h_k f(x_k)} {\sum_{k=0}^N h_k} - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{g(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{\sum_{k=0}^N (V(x_*, x_k) - V(x_*, x_{k+1}))}{\sum_{k=0}^N h_k}
-   $$
-   $$
-       \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{g(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{V(x_*, x_0) - V(x_*, x_N) }{\sum_{k=0}^N h_k} \leq \frac{\sum_{k=0}^N h_k^2 \norm{g(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{V(x_*, x_0) }{\sum_{k=0}^N h_k}
-   $$
-\end{proof}
-
-\begin{remark}
-   Если в \eqref{adapt_est} выбрать шаг следующим образом:
-   \begin{equation} \label{eps_step}
-       h_{k} = \frac{\varepsilon}{\norm{g(x_k)}^2},
-   \end{equation}
-   и воспользоваться критерием остановки:
-   \begin{equation} \label{stop_crit}
-       \sum_{k=0}^N \frac{1} {\norm{g(x_k)}^2} \geq \frac{2 V(x_*, x_0)}{\varepsilon^2}    
-   \end{equation}
-   то скорость сходимости можно оценить так:
-   \begin{equation} \label{mirr_est}
-       \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N \frac{\varepsilon^2}{\norm{g(x_k)}^4} \norm{g(x_k)}^2} {2 \sum_{k=0}^N \frac{\varepsilon}{\norm{g(x_k)}^2}} + \frac{V(x_*, x_0) }{\sum_{k=0}^N \frac{\varepsilon}{\norm{g(x_k)}^2}} = 
-   \end{equation}  
-   \begin{equation}
-       = \frac{\varepsilon} {2} \frac{ \sum_{k=0}^N \frac{1}{\norm{g(x_k)}^2}} {\sum_{k=0}^N \frac{1} {\norm{g(x_k)}^2}} + \frac{V(x_*, x_0) }{\varepsilon \sum_{k=0}^N \frac{1} {\norm{g(x_k)}^2}}  = \frac{\varepsilon}{2} + \frac{V(x_*, x_0) }{\varepsilon \sum_{k=0}^N \frac{1} {\norm{g(x_k)}^2}} \leq \varepsilon
-   \end{equation}
-\end{remark}
-В дальнейших рассуждениях будем обзначать 
-\begin{equation}
-   x_{min}^j  := \min_{0\leq k \leq N} f(x_k) \;\;\; \text{на} \;\; j\text{-м рестарте}.
-\end{equation}
-
-\begin{algorithm}[htp]
-    \caption{Рестарты зеркального спуска при условии $\gamma$-роста с критерием остановки.}
-    \label{alg:rest_criteria}
-    \KwData{$\varepsilon > 0$}
-    \KwResult{$x_p$}
-    $p \gets 0$\;
-    $V(x_*, x_0) \gets V(x_*,x_0^0)$\;
-    \While{$p = \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{V(x_*, x_0^0)}{2}\right]}.$}{
-        $x_{p}$ --- результат работы метода \ref{mirr_upd} с шагом \ref{mirr_step} и критерием остановки $\sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq  \frac{2 \cdot 2^{\gamma} \cdot 2^{p\gamma} V(x_*, x_0) }{\mu_{\gamma}^2 V(x_*, x_0^0)^{\gamma}}  $\;
-        $x_0 = x_{min}^p$\;
-        $p=p+1$\;
-    }
-\end{algorithm}
-\begin{theorem}
-    Пусть $f$ --- удовлетворяет условию $\gamma$-роста (\ref{gamma-growth}) и также является $M$-липщицевой на $Q$ относительно некоторой функции Брегмана $V_d(x, y)$. В таком случае Алгоритм \ref{alg:rest_criteria} достигнет точности $\varepsilon$ не более чем за:
-    \begin{equation}
-       N =  \frac{4 M^2}{\mu_{\gamma}^2} \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{V(x_*, x_0^0)}{2}\right]} \text{ при } \gamma = 1
-   \end{equation}
-   или
-   \begin{equation}
-       N = \frac{8  M^2}{\mu_{\gamma}^2 (2 - 2^{\gamma})} \left[ \left(\frac{2}{V(x_*, x_0^0)}\right)^{(\gamma - 1)}  - \left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2\gamma - 2}{\gamma}} \right] \text{ при } \gamma > 1
-   \end{equation}
-\end{theorem}
-\textbf{}
-\begin{proof}
-   Поскольку начальный $\varepsilon_0$ является произвольным - выберем его следующим образом:
-   \begin{equation}
-       \mu_{\gamma}(V(x_*, x_{min}^0))^{\frac{\gamma}{2}} \leq f(x_{min}^0) - f(x_*) \leq \varepsilon_0 \leq \mu_{\gamma}(\frac{V(x_*, x_0^0)}{2})^{\frac{\gamma}{2}}
-   \end{equation}
-   \begin{equation}
-       \varepsilon_0 = \mu_{\gamma}(\frac{V(x_*, x_0^0)}{2})^{\frac{\gamma}{2}}
-   \end{equation}
-   Такой выбор $\varepsilon_0$ не нарушает требований по заданной точности $\varepsilon$. Метод выстроен так, что можно показать слудующее:
-   \begin{equation}
-       \varepsilon_0 = \varepsilon \cdot \left(\sqrt{2}\right)^{p\gamma}
-   \end{equation}
-   Критерий остановки:
-   \begin{equation}
-       V(x_*, x_0^0) \leq \frac{1}{2} \sum_{k=0}^N \frac{\varepsilon_0^2}{\norm{\nabla f(x_k) }_2^2} \leq \frac{\mu_{\gamma}^2}{2} \frac{V(x_*, x_0^0)^{\gamma}}{2^\gamma} \sum_{k=0}^N \frac{1}{\norm{\nabla f(x_k) }_2^2}
-   \end{equation}
-   Если $\norm{\nabla f(x_k) }_2 \leq M$, то
-   \begin{equation}
-       \sum_{k=0}^{N_0} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{N_0}{M^2}
-   \end{equation}
-   Значит критерий остановки будет заведомо ваыполнен при:
-   \begin{equation}
-       V(x_*, x_0^0) \leq \frac{\mu_{\gamma}^2}{2} \frac{V(x_*, x_0^0)^{\gamma}}{2^\gamma} \frac{N_0}{M^2} \leq \frac{\mu_{\gamma}^2}{2} \frac{V(x_*, x_0^0)^{\gamma}}{2^\gamma} \sum_{k=0}^N \frac{1}{\norm{\nabla f(x_k) }_2^2}
-   \end{equation}
-   Откуда:
-   \begin{equation}
-       N_0 \geq \frac{2^{\gamma + 1} M^2}{\mu_{\gamma}^2} V(x_*, x_0^0)^{(1 - \gamma)}
-   \end{equation}
-   Пусть:
-   \begin{equation}
-       \varepsilon_p = \mu_{\gamma} (\frac{V(x_*, x_0^0)}{2^{p+1}})^{\frac{\gamma}{2}}
-   \end{equation}
-   тогда аналогично: 
-   \begin{equation}
-       \mu_{\gamma}(V(x_*, x_{min}^p))^{\frac{\gamma}{2}} \leq f(x_{min}^p) - f(x_*) \leq \varepsilon_p
-   \end{equation}
-   соответсвенно:
-   \begin{equation}
-       \mu_{\gamma}(V(x_*, x_{min}^{p-1}))^{\frac{\gamma}{2}} \leq \mu_{\gamma} (\frac{V(x_*, x_0^0)}{2^p})^{\frac{\gamma}{2}}
-   \end{equation}
-   \begin{equation} \label{eq:v_sup}
-       V(x_*, x_{min}^{p-1}) = V(x_*, x_0^p) \leq \frac{V(x_*, x_0^0)}{2^p}
-   \end{equation}
-   Соответствующий критерий остановки:
-   \begin{equation}
-       V(x_*, x_0^p) \leq \frac{1}{2} \sum_{k=0}^N \frac{\varepsilon_p^2}{\norm{\nabla f(x_k) }_2^2} \leq \frac{\mu_{\gamma}^2}{2} \frac{V(x_*, x_0^0)^{\gamma}}{2^{\gamma} 2^{p\gamma}} \sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_2^2}
-   \end{equation}
-   и заведомо выполнен при:
-   \begin{equation}
-       V(x_*, x_0^p) \leq \frac{\mu_{\gamma}^2}{2} \frac{V(x_*, x_0^0)^{\gamma}}{2^{\gamma} 2^{p\gamma}} \frac{N_p}{M^2} \leq \frac{\mu_{\gamma}^2}{2} \frac{V(x_*, x_0^0)^{\gamma}}{2^{\gamma} 2^{p\gamma}} \sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_2^2}
-   \end{equation}
-   \begin{equation}
-       N_p \geq \frac{2 \cdot 2^{\gamma} \cdot 2^{p\gamma} M^2}{2^p \mu_{\gamma}^2} V(x_*, x_0^0)^{(1 - \gamma)} \geq \frac{2 \cdot 2^{\gamma} \cdot 2^{p\gamma} M^2}{\mu_{\gamma}^2} \frac{V(x_*, x_0^p)}{V(x_*, x_0^0)^\gamma}
-   \end{equation}
-   Используя полученное неравнсво мы получаем следующую оценку для $N_p$:
-   \begin{equation}
-        N_p \geq \frac{2 \cdot 2^{\gamma} \cdot 2^{p\gamma} M^2}{2^p \mu_{\gamma}^2} V(x_*, x_0^0)^{(1 - \gamma)}
-   \end{equation}
-   Используя данный подход получим следующую оценку (достаточно завышенную):
-   \begin{equation}
-       \sum_{k=1}^{p} N_k \geq \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2} V(x_*, x_0^0)^{(1 - \gamma)} (1 + 2^{(\gamma-1)} + 2^{2(\gamma - 1)} + ... + 2^{p(\gamma - 1)}) = \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2} \frac{1 - 2^{p(\gamma-1)}}{1 - 2^{(\gamma-1)}} (V(x_*, x_0^0))^{1 - \gamma}
-   \end{equation}
-   Так же отдельно рассмотрим случай $\gamma = 1$:
-   \begin{equation}
-       \sum_{k=1}^{p} N_k = \frac{4 p M^2}{\mu_{\gamma}^2} 
-   \end{equation}
-   Для финальной оценки необходимо получить оценку для количества рестартов $p$, обозначим $\varepsilon := \varepsilon_p$ - то есть финальную, необходимую точность:
-   \begin{equation}
-       \varepsilon = \varepsilon_p = \mu_{\gamma} (\frac{V(x_*, x_0^0)}{2^{p+1}})^{\frac{\gamma}{2}}
-   \end{equation}
-   \begin{equation}
-       (\frac{\varepsilon}{\mu_{\gamma}})^{\frac{2}{\gamma}} =  \frac{V(x_*, x_0^0)}{2^{p+1}}
-   \end{equation}
-   \begin{equation}
-        2^p =  (\frac{\mu_{\gamma}}{\varepsilon})^{\frac{2}{\gamma}} \frac{V(x_*, x_0^0)}{2}
-   \end{equation}
-   \begin{equation}
-        p = \log_2{((\frac{\mu_{\gamma}}{\varepsilon})^{\frac{2}{\gamma}} \frac{V(x_*, x_0^0)}{2})}
-   \end{equation}
-   Соответсвенно при $\gamma > 1$:
-   \begin{equation}
-       \sum_{k=1}^{p} N_k \geq \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2} \frac{1 - 2^{p(\gamma-1)}}{1 - 2^{(\gamma-1)}} (V(x_*, x_0^0))^{1 - \gamma} = \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2 (1 - 2^{(\gamma-1)})} (1 - ((\frac{\mu_{\gamma}}{\varepsilon})^{\frac{2}{\gamma}} \frac{V(x_*, x_0^0)}{2}) ^{(\gamma-1)}) V(x_*, x_0^0)^{1 - \gamma} = 
-   \end{equation}
-   \begin{equation}
-       = \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2 (1 - 2^{(\gamma-1)}) 2^{(\gamma - 1)}} (2^{(\gamma - 1)}V(x_*, x_0^0)^{1 - \gamma}  - (\frac{\mu_{\gamma}}{\varepsilon})^{\frac{2\gamma - 2}{\gamma}}) = \frac{8  M^2}{\mu_{\gamma}^2 (2 - 2^{\gamma})} ((\frac{2}{V(x_*, x_0^0)})^{(\gamma - 1)}  - (\frac{\mu_{\gamma}}{\varepsilon})^{\frac{2\gamma - 2}{\gamma}}) 
-   \end{equation}
-   Таким образом получаем оценки:
-   \begin{equation}
-       \mathcal{O} \left( \frac{4 M^2}{\mu_{\gamma}^2} \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{V(x_*, x_0^0)}{2}\right]}\right) \text{ при } \gamma = 1
-   \end{equation}
-   \begin{equation}
-       \mathcal{O} \left( \frac{8  M^2}{\mu_{\gamma}^2 (2 - 2^{\gamma})} \left[ \left(\frac{2}{V(x_*, x_0^0)}\right)^{(\gamma - 1)}  - \left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2\gamma - 2}{\gamma}} \right]\right) \text{ при } \gamma > 1
-   \end{equation}
-   
-   \iffalse
-       Соотвтиественно при $\gamma > 1$, степень $1 - \gamma$ является отрицательной, потому справедливо следующее изменение оценки \eqref{eq:v_sup}:
+    \begin{definition} \label{gamma-growth}
+       $f$ --- удовлетворяет условию $\gamma$-роста тогда и только тогда:
        \begin{equation}
-           V(x_*, x_{min}^p)^{(1 - \gamma)} \geq (\frac{V(x_*, x_0^p)}{2})^{(1 - \gamma)} \geq \frac{V(x_*, x_0^0)^{(1 - \gamma)}}{2^{p(1 - \gamma)} 2^{(1 - \gamma)}}
+           f(x) - f(x_*) \geq \mu_{\gamma}(V(x_*,x))^{\gamma/2}
        \end{equation}
-       то есть: 
+    \end{definition}
+
+    \begin{theorem}
+        Пусть $f$ --- удовлетворяет условию $\gamma$-роста (\ref{gamma-growth}) и также является $M$-липщицевой на $Q$ относительно некоторой функции Брегмана $V_d(x, y)$. В таком случае Алгоритм \ref{alg:rest_gamma} достигнет точности $\epsilon$ не более чем за:
+        \begin{equation}
+           N = \frac{M^2 2^{\gamma}(1 - V(x_*, x_0^0)^{1 - \gamma}) }{\mu_{\gamma}^2 \varepsilon^{(\gamma-1)} (2^{(\gamma-1)} - 1)} = \frac{M^2}{\mu_{\gamma}^2 (\frac{1}{2} - \frac{1}{2^\gamma}) \varepsilon^{(\gamma-1)} } (1 - \frac{1} {V(x_*, x_0^0)^{(\gamma - 1)}})
+        \end{equation}
+        причем будут справедливы неравенства:
+        \begin{equation}
+           V(x_*, \widehat{x_p}) \leq \varepsilon
+        \end{equation}
+        и
+        \begin{equation}
+            f(\widehat{x_p}) - f(x_*) \leq  \langle g(\widehat{x_p}), \widehat{x_p} - x_* \rangle \leq M \sqrt{ 2 V(x_*, \widehat{x_p})} \leq M \sqrt{2 \varepsilon}  
+        \end{equation}
+    \end{theorem}
+
+    \begin{algorithm}[htp]
+        \caption{Рестарты зеркального спуска при условии $\gamma$-роста.}
+        \label{alg:rest_gamma}
+        \KwData{$\varepsilon > 0$}
+        \KwResult{$x_p$}
+        $p \gets 0$\;
+        $V(x_*, x_0) \gets V(x_*,x_0^0)$\;
+        \While{$p > \log_2\left(\frac{V(x_*, x_0^0)}{\varepsilon}\right).$}{
+            $x_{p}$ --- результат работы метода \ref{mirr_upd} с шагом \ref{mirr_step} и количеством шагов $N_{p} = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{p(1 - \gamma)}} V(x_*, x_0^0)^{1 - \gamma}$\;
+            $x_0 = \widehat{x_p}$\;
+            $V(x_*, x_0) \gets \frac{1}{2^{p+1}}V_{0}(x_*, x_0^0)$\;
+            $p=p+1$\;
+        }
+    \end{algorithm}
+
+    \begin{proof}
+       Объединим в систему свойство \ref{gamma-growth} и оценку \ref{mirr_est}. В доказательстве используется обозначение $x_m^n$, где $m - 0...N$ соответсвует номеру итерации и $n - 0...p$ соответсвует номеру рестарта: 
+       $$
+           \mu_{\gamma}(V(x_*, \widehat{x_N^0}))^{\frac{\gamma}{2}} \leq f(\widehat{x_N^0}) - f(x_*) \leq \frac{M\sqrt{V(x_*, x_0^0)}}{\sqrt{N}}
+       $$
+       $$
+           \mu_{\gamma}(V(x_*, \widehat{x_N^0}))^{\frac{\gamma}{2}} \leq \frac{M\sqrt{V(x_*, x_0^0)}}{\sqrt{N}}
+       $$
+       $$
+           (V(x_*, \widehat{x_N^0}))^{\frac{\gamma}{2}} \leq \frac{M\sqrt{V(x_*, x_0^0)}}{\mu_{\gamma}\sqrt{N}}
+       $$
+       $$
+           V(x_*, \widehat{x_N^0}) \leq (\frac{M}{\mu_{\gamma}\sqrt{ N}})^{\frac{2}{\gamma}} (V(x_*, x_0^0))^{\frac{1}{\gamma}}
+       $$
+       $$
+           V(x_*, \widehat{x_N^0}) \leq V(x_*, x_0^0) (\frac{M}{\mu_{\gamma}\sqrt{N}})^{\frac{2}{\gamma}} (V(x_*, x_0^0))^{\frac{1}{\gamma} - 1}
+       $$
+       Теперь можно оценить необходимое количество итераций для 0 запуска:
+       $$
+           (\frac{M}{\mu_{\gamma}\sqrt{N}})^{\frac{2}{\gamma}} (V(x_*, x_0^0))^{\frac{1}{\gamma} - 1} \leq \frac{1}{2} 
+       $$
+       $$
+           (\frac{M}{\mu_{\gamma}})^{\frac{2}{\gamma}} (V(x_*, x_0^0))^{\frac{1}{\gamma} - 1} \leq \frac{1}{2} N^{\frac{1}{\gamma}} 
+       $$
+       $$
+           (\frac{M}{\mu_{\gamma}})^{\frac{2}{\gamma}} (V(x_*, x_0^0))^{\frac{1}{\gamma} - 1} \leq \frac{1}{2} N^{\frac{1}{\gamma}} 
+       $$
+       $$
+           \frac{1}{2} N^{\frac{1}{\gamma}} \geq (\frac{M}{\mu_{\gamma}})^{\frac{2}{\gamma}} (V(x_*, x_0^0))^{\frac{1}{\gamma} - 1}  
+       $$
+       $$
+           N \geq 2 ^ {\gamma} \frac{M^2}{\mu_{\gamma}^2} (V(x_*, x_0^0))^{1 - \gamma}  
+       $$
+       $$
+           N \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, x_0^0))^{1 - \gamma}  
+       $$
+       Проверим поведение для нескольких последующих рестартов. Для 1-го запуска $x_0^1 = \widehat{x_N^0}$:
+       $$
+           V(x_*, \widehat{x_N^1}) \leq \frac{1}{2} V(x_*, x_0^1) = \frac{1}{2} V(x_*, \widehat{x_N^0}) \leq (\frac{1}{2})^2 V(x_*, x_0^0) 
+       $$
+       после:
+       $$
+           N_1 \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, x_0^1))^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, \widehat{x_N^0}))^{1 - \gamma} 
+       $$
+       при $\gamma > 1$:
+       $$
+           V(x_*, \widehat{x_N^0}) \leq \frac{1}{2}V(x_*, x_0^0)  
+       $$
+       $$
+           (V(x_*, \widehat{x_N^0}))^{\gamma - 1} \leq (\frac{1}{2} V(x_*, x_0^0))^{\gamma - 1}
+       $$
+       $$
+            (\frac{1}{2} V(x_*, x_0^0))^{1 - \gamma} \leq (V(x_*, \widehat{x_N^0}))^{1 - \gamma}
+       $$
+       соответсвенно:
+       $$
+           N_1 \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, \widehat{x_N^0}))^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (\frac{1}{2} V(x_*, x_0^0))^{1 - \gamma} = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{1-\gamma}} (V(x_*, x_0^0))^{1 - \gamma}
+       $$
+       Для 2-го запуска $x_0^2 = \widehat{x_N^1}$:
+       $$
+           V(x_*, \widehat{x_N^2}) \leq \frac{1}{2} V(x_*, x_0^2) \leq (\frac{1}{2})^3 V(x_*, x_0^0) 
+       $$
+       после:
+       $$
+           N_2 \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, x_0^2))^{1 - \gamma} = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, \widehat{x_N^1}))^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{1 - \gamma}} (V(x_*, x_0^1))^{1 - \gamma} \geq 
+       $$
+       $$
+           \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{2(1 - \gamma)}} (V(x_*, x_0^0))^{1 - \gamma} 
+       $$
+       Для $(p-1)$-го запуска:
+       \begin{equation} \label{v_seq}
+           V(x_*, \widehat{x_N^{p-1}}) \leq \frac{1}{2^p} V(x_*, x_0^0)
+       \end{equation}
+       после:
+       \begin{equation} \label{n_seq}
+           N_{p-1} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{(p - 1)(1 - \gamma)}} (V(x_*, x_0^0))^{1 - \gamma}
+       \end{equation}
+       Используя найденную зависимость \ref{v_seq}, проведем оценку общего числа обращений к оракулу (здесь предполагается, что $\gamma > 1$ - равенство рассмотрим далее):
+       $$
+           \sum_{k=1}^{p - 1} N_k \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} (V(x_*, x_0^0))^{1 - \gamma} (1 + 2^{(\gamma-1)} + 2^{2(\gamma - 1)} + ... + 2^{(p-1)(\gamma - 1)}) = 
+       $$
+       $$
+           = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \frac{1 - 2^{(p-1)(\gamma-1)}}{1 - 2^{(\gamma-1)}} (V(x_*, x_0^0))^{1 - \gamma}
+       $$
+       Если задать ограничение для $V(x_*, \widehat{x_N^{p-1}})$:
+       $$
+           V(x_*, \widehat{x_N^{p-1}}) \leq \frac{1}{2^p} V(x_*, x_0^0) \leq \varepsilon
+       $$
+       $$
+            2^p \geq \frac{1}{\varepsilon} V(x_*, x_0^0)
+       $$
+       Откуда получаем оценку для количества рестартов:
        \begin{equation}
-           V(x_*, x_0^p)^{(1 - \gamma)} \geq \frac{V(x_*, x_0^0)^{(1 - \gamma)} 2^{(1-\gamma)}}{2^{p(1 - \gamma)} 2^{(1 - \gamma)}} = \frac{V(x_*, x_0^0)^{(1 - \gamma)}}{2^{p(1 - \gamma)}}
+            p \geq \log_2{\frac{V(x_*, x_0^0)}{\varepsilon}}
+       \end{equation}
+       Используем это для оценки общего количества обращений к <<оракулу>>:
+       $$
+           \sum_{k=1}^{p} N_k \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \frac{1 - 2^{p(\gamma-1)}}{1 - 2^{(\gamma-1)}} (V(x_*, x_0^0))^{1 - \gamma} \geq 
+       $$
+       $$
+           \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 (1 - 2^{(\gamma-1)})} (1 - \frac{V(x_*, x_0^0)^{(\gamma-1)}}{\varepsilon^{(\gamma-1)}}) (V(x_*, x_0^0))^{1 - \gamma} =
+       $$
+       $$
+           = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 (2^{(\gamma-1)} - 1)} (\frac{V(x_*, x_0^0)^{(\gamma-1)}}{\varepsilon^{(\gamma-1)}} - 1) (V(x_*, x_0^0))^{1 - \gamma} = \frac{M^2 2^{\gamma}(1 - V(x_*, x_0^0)^{1 - \gamma}) }{\mu_{\gamma}^2 \varepsilon^{(\gamma-1)} (2^{(\gamma-1)} - 1)} = 
+       $$
+       $$
+           = \frac{M^2}{\mu_{\gamma}^2 (\frac{1}{2} - \frac{1}{2^\gamma}) \varepsilon^{(\gamma-1)} } (1 - \frac{1} {V(x_*, x_0^0)^{(\gamma - 1)}}) \geq \frac{2 M^2}{\mu_{\gamma}^2 \varepsilon^{(\gamma-1)} } (1 - \frac{1} {V(x_*, x_0^0)^{(\gamma - 1)}}) 
+       $$
+       Отдельно рассмотрим случай, когда $\gamma = 1$:
+       $$
+           \sum_{k=1}^{p} N_k = \frac{2 p M^2}{\mu_{\gamma}^2} \geq \frac{2 M^2}{\mu_{\gamma}^2} \log_2{\frac{V(x_*, x_0^0)}{\varepsilon}}
+       $$
+       Таким образом получаем оценки:
+       $$
+           \mathcal{O} \left(\frac{2 M^2}{\mu_{\gamma}^2} \log_2{\frac{V(x_*, x_0^0)}{\varepsilon}}\right) \text{ при } \gamma = 1
+       $$
+       $$
+           \mathcal{O} \left(\frac{M^2}{\mu_{\gamma}^2 \left(\frac{1}{2} - \frac{1}{2^\gamma}\right) \varepsilon^{(\gamma-1)} } \left[1 - \frac{1} {V(x_*, x_0^0)^{(\gamma - 1)}}\right]\right) =
+       $$
+       $$
+           = \mathcal{O} \left(\frac{2 M^2}{\mu_{\gamma}^2 \varepsilon^{(\gamma-1)} } \left[1 - \frac{1} {V(x_*, x_0^0)^{(\gamma - 1)}}\right]\right) \text{ при } \gamma > 1
+       $$
+    \end{proof}
+    \begin{theorem}
+        Пусть $f$ --- удовлетворяет условию $\gamma$-роста (\ref{gamma-growth}) и также является $M$-липщицевой на $Q$ относительно некоторой функции Брегмана $V_d(x, y)$. В таком случае Алгоритм \ref{alg:rest_gamma} достигнет точности $\delta$ не более чем за:
+        \begin{equation}
+           N = \frac{M^{2\gamma} 2^{(2\gamma - 1)}(1 - V(x_*, x_0^0)^{1 - \gamma}) }{\mu_{\gamma}^2 \delta^{(2\gamma - 2)} (2^{(\gamma-1)} - 1)}
+        \end{equation}
+        причем будут справедливы неравенства:
+        \begin{equation}
+           f(\widehat{x_p}) - f(x_*)  \leq \delta 
+        \end{equation}
+        и
+        \begin{equation}
+           V(x_*, \widehat{x_p}) \leq \frac{\delta^2}{2 M^2}
+        \end{equation}
+    \end{theorem}
+
+\section{Адаптивный вариант зеркального спуска для липшицевых задач с гамма-ростом}\label{sec:ch3/sect4}
+
+    Для дальнейших рассуждений необходим адаптивный аналог оценки \eqref{general_est}. Понадобится вспомогательная лемма:
+    \begin{lemma}\label{th:base}
+       Если для $g$ верно \eqref{rel_bound}, а $x_k$ и $x_{k+1}$ удовлетворяют \eqref{eq:4}, то для произвольного $x \in Q$ верно неравенство
+       \begin{equation} \label{base_eq}
+           h_k \langle g(x_k), x_k - x \rangle \leq \frac{h_k^2}{2} \norm{g(x_k)}^2 + V(x, x_k) - V(x, x_{k+1}).
+       \end{equation}
+    \end{lemma}
+
+    \begin{proof}
+       Непосредственно проверим следующие неравенства:
+       $$
+           h_k \langle g(x_k), x_k - x \rangle \leq h_k \langle g(x_k), x_k - x_{k+1} \rangle + V(x, x_k) - V(x, x_{k+1}) - V(x_{k+1}, x_k) \leq 
+       $$
+       $$
+           \leq h_k \norm{g(x_k)}_* \norm{x_k - x_{k+1}}_* + V(x, x_k) - V(x, x_{k+1}) - V(x_{k+1}, x_k) \leq 
+       $$
+       $$
+           \leq h_k \norm{g(x_k)}_* \sqrt{2V(x_{k+1}, x_k)} + V(x, x_k) - V(x, x_{k+1}) - V(x_{k+1}, x_k) \leq 
+       $$
+       $$
+           \leq \frac{h_k^2}{2} \norm{g(x_k)}^2 + V(x, x_k) - V(x, x_{k+1})
+       $$
+    \end{proof}
+
+    \begin{remark} \label{adapt_mirror}
+        Для теоремы \ref{vanilla_mirror} можно уточнить полученную оценку: 
+        \begin{equation} \label{adapt_est}
+            \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{g(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{V(x_*, x_0) }{\sum_{k=0}^N h_k}
+        \end{equation}
+    \end{remark}
+
+    \begin{proof}
+       Пусть алгоритм \ref{mirr_upd} отработал $N$ шагов, тогда просуммируем неравенства \eqref{base_eq}:
+       $$
+           h_k (f(x_k) - f(x_*)) \leq h_k \langle g(x_k), x_k - x_* \rangle \leq \frac{h_k^2}{2} \norm{g(x_k)}^2 + V(x_*, x_k) - V(x_*, x_{k+1})
+       $$
+       $$
+           \sum_{k=0}^N h_k (f(x_k) - f(x_*)) \leq \sum_{k=0}^N \frac{h_k^2}{2} \norm{g(x_k)}^2 + \sum_{k=0}^N (V(x_*, x_k) - V(x_*, x_{k+1}))
+       $$
+       $$
+           \frac{\sum_{k=0}^N h_k f(x_k)} {\sum_{k=0}^N h_k} - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{g(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{\sum_{k=0}^N (V(x_*, x_k) - V(x_*, x_{k+1}))}{\sum_{k=0}^N h_k}
+       $$
+       $$
+           \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{g(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{V(x_*, x_0) - V(x_*, x_N) }{\sum_{k=0}^N h_k} \leq
+       $$
+       $$
+           \leq \frac{\sum_{k=0}^N h_k^2 \norm{g(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{V(x_*, x_0) }{\sum_{k=0}^N h_k}
+       $$
+    \end{proof}
+
+    \begin{remark}
+       Если в \eqref{adapt_est} выбрать шаг следующим образом:
+       \begin{equation} \label{eps_step}
+           h_{k} = \frac{\varepsilon}{\norm{g(x_k)}^2},
+       \end{equation}
+       и воспользоваться критерием остановки:
+       \begin{equation} \label{stop_crit}
+           \sum_{k=0}^N \frac{1} {\norm{g(x_k)}^2} \geq \frac{2 V(x_*, x_0)}{\varepsilon^2}    
+       \end{equation}
+       то скорость сходимости можно оценить так:
+       \begin{equation} \label{mirr_est}
+           \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N \frac{\varepsilon^2}{\norm{g(x_k)}^4} \norm{g(x_k)}^2} {2 \sum_{k=0}^N \frac{\varepsilon}{\norm{g(x_k)}^2}} + \frac{V(x_*, x_0) }{\sum_{k=0}^N \frac{\varepsilon}{\norm{g(x_k)}^2}} = 
+       \end{equation}  
+       \begin{equation}
+           = \frac{\varepsilon} {2} \frac{ \sum_{k=0}^N \frac{1}{\norm{g(x_k)}^2}} {\sum_{k=0}^N \frac{1} {\norm{g(x_k)}^2}} + \frac{V(x_*, x_0) }{\varepsilon \sum_{k=0}^N \frac{1} {\norm{g(x_k)}^2}}  = \frac{\varepsilon}{2} + \frac{V(x_*, x_0) }{\varepsilon \sum_{k=0}^N \frac{1} {\norm{g(x_k)}^2}} \leq \varepsilon
+       \end{equation}
+    \end{remark}
+    В дальнейших рассуждениях будем обзначать 
+    \begin{equation}
+       x_{min}^j  := \min_{0\leq k \leq N} f(x_k) \;\;\; \text{на} \;\; j\text{-м рестарте}.
+    \end{equation}
+
+    \begin{algorithm}[htp]
+        \caption{Рестарты зеркального спуска при условии $\gamma$-роста с критерием остановки.}
+        \label{alg:rest_criteria}
+        \KwData{$\varepsilon > 0$}
+        \KwResult{$x_p$}
+        $p \gets 0$\;
+        $V(x_*, x_0) \gets V(x_*,x_0^0)$\;
+        \While{$p = \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{V(x_*, x_0^0)}{2}\right]}.$}{
+            $x_{p}$ --- результат работы метода \ref{mirr_upd} с шагом \ref{eps_step} и критерием остановки $\sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq  \frac{2 \cdot 2^{\gamma} \cdot 2^{p\gamma} V(x_*, x_0) }{\mu_{\gamma}^2 V(x_*, x_0^0)^{\gamma}}  $\;
+            $x_0 = x_{min}^p$\;
+            $p=p+1$\;
+        }
+    \end{algorithm}
+    \begin{theorem}
+        Пусть $f$ --- удовлетворяет условию $\gamma$-роста (\ref{gamma-growth}) и также является $M$-липщицевой на $Q$ относительно некоторой функции Брегмана $V_d(x, y)$. В таком случае Алгоритм \ref{alg:rest_criteria} достигнет точности $\varepsilon$ не более чем за:
+        \begin{equation}
+           N =  \frac{4 M^2}{\mu_{\gamma}^2} \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{V(x_*, x_0^0)}{2}\right]} \text{ при } \gamma = 1
+       \end{equation}
+       или
+       \begin{equation}
+           N = \frac{8  M^2}{\mu_{\gamma}^2 (2 - 2^{\gamma})} \left[ \left(\frac{2}{V(x_*, x_0^0)}\right)^{(\gamma - 1)}  - \left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2\gamma - 2}{\gamma}} \right] \text{ при } \gamma > 1
+       \end{equation}
+    \end{theorem}
+    \textbf{}
+    \begin{proof}
+       Поскольку начальный $\varepsilon_0$ является произвольным - выберем его следующим образом:
+       \begin{equation}
+           \mu_{\gamma}(V(x_*, x_{min}^0))^{\frac{\gamma}{2}} \leq f(x_{min}^0) - f(x_*) \leq \varepsilon_0 \leq \mu_{\gamma}(\frac{V(x_*, x_0^0)}{2})^{\frac{\gamma}{2}}
+       \end{equation}
+       \begin{equation}
+           \varepsilon_0 = \mu_{\gamma}(\frac{V(x_*, x_0^0)}{2})^{\frac{\gamma}{2}}
+       \end{equation}
+       Такой выбор $\varepsilon_0$ не нарушает требований по заданной точности $\varepsilon$. Метод выстроен так, что можно показать слудующее:
+       \begin{equation}
+           \varepsilon_0 = \varepsilon \cdot \left(\sqrt{2}\right)^{p\gamma}
+       \end{equation}
+       Критерий остановки:
+       \begin{equation}
+           V(x_*, x_0^0) \leq \frac{1}{2} \sum_{k=0}^N \frac{\varepsilon_0^2}{\norm{\nabla f(x_k) }_2^2} \leq \frac{\mu_{\gamma}^2}{2} \frac{V(x_*, x_0^0)^{\gamma}}{2^\gamma} \sum_{k=0}^N \frac{1}{\norm{\nabla f(x_k) }_2^2}
+       \end{equation}
+       Если $\norm{\nabla f(x_k) }_2 \leq M$, то
+       \begin{equation}
+           \sum_{k=0}^{N_0} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{N_0}{M^2}
+       \end{equation}
+       Значит критерий остановки будет заведомо ваыполнен при:
+       \begin{equation}
+           V(x_*, x_0^0) \leq \frac{\mu_{\gamma}^2}{2} \frac{V(x_*, x_0^0)^{\gamma}}{2^\gamma} \frac{N_0}{M^2} \leq \frac{\mu_{\gamma}^2}{2} \frac{V(x_*, x_0^0)^{\gamma}}{2^\gamma} \sum_{k=0}^N \frac{1}{\norm{\nabla f(x_k) }_2^2}
+       \end{equation}
+       Откуда:
+       \begin{equation}
+           N_0 \geq \frac{2^{\gamma + 1} M^2}{\mu_{\gamma}^2} V(x_*, x_0^0)^{(1 - \gamma)}
+       \end{equation}
+       Пусть:
+       \begin{equation}
+           \varepsilon_p = \mu_{\gamma} (\frac{V(x_*, x_0^0)}{2^{p+1}})^{\frac{\gamma}{2}}
+       \end{equation}
+       тогда аналогично: 
+       \begin{equation}
+           \mu_{\gamma}(V(x_*, x_{min}^p))^{\frac{\gamma}{2}} \leq f(x_{min}^p) - f(x_*) \leq \varepsilon_p
+       \end{equation}
+       соответсвенно:
+       \begin{equation}
+           \mu_{\gamma}(V(x_*, x_{min}^{p-1}))^{\frac{\gamma}{2}} \leq \mu_{\gamma} (\frac{V(x_*, x_0^0)}{2^p})^{\frac{\gamma}{2}}
+       \end{equation}
+       \begin{equation} \label{eq:v_sup}
+           V(x_*, x_{min}^{p-1}) = V(x_*, x_0^p) \leq \frac{V(x_*, x_0^0)}{2^p}
+       \end{equation}
+       Соответствующий критерий остановки:
+       \begin{equation}
+           V(x_*, x_0^p) \leq \frac{1}{2} \sum_{k=0}^N \frac{\varepsilon_p^2}{\norm{\nabla f(x_k) }_2^2} \leq \frac{\mu_{\gamma}^2}{2} \frac{V(x_*, x_0^0)^{\gamma}}{2^{\gamma} 2^{p\gamma}} \sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_2^2}
+       \end{equation}
+       и заведомо выполнен при:
+       \begin{equation}
+           V(x_*, x_0^p) \leq \frac{\mu_{\gamma}^2}{2} \frac{V(x_*, x_0^0)^{\gamma}}{2^{\gamma} 2^{p\gamma}} \frac{N_p}{M^2} \leq \frac{\mu_{\gamma}^2}{2} \frac{V(x_*, x_0^0)^{\gamma}}{2^{\gamma} 2^{p\gamma}} \sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_2^2}
+       \end{equation}
+       \begin{equation}
+           N_p \geq \frac{2 \cdot 2^{\gamma} \cdot 2^{p\gamma} M^2}{2^p \mu_{\gamma}^2} V(x_*, x_0^0)^{(1 - \gamma)} \geq \frac{2 \cdot 2^{\gamma} \cdot 2^{p\gamma} M^2}{\mu_{\gamma}^2} \frac{V(x_*, x_0^p)}{V(x_*, x_0^0)^\gamma}
        \end{equation}
        Используя полученное неравнсво мы получаем следующую оценку для $N_p$:
        \begin{equation}
-            N_p \geq \frac{2^{\gamma + 1} M^2}{\mu_{\gamma}^2} V(x_*, x_0^p)^{(1 - \gamma)} \geq  \frac{2^{\gamma + 1} M^2}{\mu_{\gamma}^2} \frac{V(x_*, x_0^0)^{(1 - \gamma)}}{2^{p(1 - \gamma)}} = \frac{2 \cdot 2^{\gamma} \cdot 2^{p\gamma} M^2}{2^p \mu_{\gamma}^2} V(x_*, x_0^0)^{(1 - \gamma)}
+            N_p \geq \frac{2 \cdot 2^{\gamma} \cdot 2^{p\gamma} M^2}{2^p \mu_{\gamma}^2} V(x_*, x_0^0)^{(1 - \gamma)}
        \end{equation}
        Используя данный подход получим следующую оценку (достаточно завышенную):
-       $$
-           \sum_{k=1}^{p} N_k \geq \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2} V(x_*, x_0^0)^{(1 - \gamma)} (1 + 2^{(\gamma-1)} + 2^{2(\gamma - 1)} + ... + 2^{p(\gamma - 1)}) = \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2} \frac{1 - 2^{p(\gamma-1)}}{1 - 2^{(\gamma-1)}} (V(x_*, x_0^0))^{1 - \gamma}
-       $$
+       \begin{equation}
+        \begin{aligned}
+           \sum_{k=1}^{p} N_k \geq \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2} V(x_*, x_0^0)^{(1 - \gamma)} (1 + 2^{(\gamma-1)} + 2^{2(\gamma - 1)} + ... + 2^{p(\gamma - 1)}) = \\
+           = \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2} \frac{1 - 2^{p(\gamma-1)}}{1 - 2^{(\gamma-1)}} (V(x_*, x_0^0))^{1 - \gamma}
+       \end{aligned}
+       \end{equation}
        Так же отдельно рассмотрим случай $\gamma = 1$:
-       $$
+       \begin{equation}
            \sum_{k=1}^{p} N_k = \frac{4 p M^2}{\mu_{\gamma}^2} 
-       $$
+       \end{equation}
        Для финальной оценки необходимо получить оценку для количества рестартов $p$, обозначим $\varepsilon := \varepsilon_p$ - то есть финальную, необходимую точность:
        \begin{equation}
-           \varepsilon = \varepsilon_p = \mu_{\gamma} (\frac{V(x_*, x_0^p)}{2})^{\frac{\gamma}{2}} \leq  \mu_{\gamma} (\frac{V(x_*, x_0^0)}{2^{p+1}})^{\frac{\gamma}{2}}
+           \varepsilon = \varepsilon_p = \mu_{\gamma} \left(\frac{V(x_*, x_0^0)}{2^{p+1}}\right)^{\frac{\gamma}{2}}
        \end{equation}
        \begin{equation}
-           (\frac{\varepsilon}{\mu_{\gamma}})^{\frac{2}{\gamma}} \leq  \frac{V(x_*, x_0^0)}{2 \cdot 2^p}
+           \left(\frac{\varepsilon}{\mu_{\gamma}}\right)^{\frac{2}{\gamma}} =  \frac{V(x_*, x_0^0)}{2^{p+1}}
        \end{equation}
        \begin{equation}
-           (\frac{\varepsilon}{\mu_{\gamma}})^{\frac{2}{\gamma}} \leq  \frac{V(x_*, x_0^0)}{2 \cdot 2^p}
+            2^p =  \left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{V(x_*, x_0^0)}{2}
        \end{equation}
-       Критерий?:
        \begin{equation}
-           V(x_*, x_0^p) \leq \frac{1}{2} \sum_{k=0}^N \frac{\varepsilon_p^2}{\norm{\nabla f(x_k) }_2^2} \leq \frac{\varepsilon_p^2}{2} \frac{N_p}{M^2}
+            p = \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{V(x_*, x_0^0)}{2}\right]}
        \end{equation}
-   \fi
-\end{proof}
+       Соответсвенно при $\gamma > 1$:
+       \begin{equation}
+       \begin{aligned}
+           \sum_{k=1}^{p} N_k \geq \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2} \frac{1 - 2^{p(\gamma-1)}}{1 - 2^{(\gamma-1)}} (V(x_*, x_0^0))^{1 - \gamma} = \\
+           = \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2 (1 - 2^{(\gamma-1)})} \left[1 - \left(\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{V(x_*, x_0^0)}{2}\right) ^{(\gamma-1)}\right] V(x_*, x_0^0)^{1 - \gamma} = \\
+           = \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2 (1 - 2^{(\gamma-1)}) 2^{(\gamma - 1)}} \left(2^{(\gamma - 1)}V(x_*, x_0^0)^{1 - \gamma}  - \left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2\gamma - 2}{\gamma}}\right) = \\ 
+           = \frac{8  M^2}{\mu_{\gamma}^2 (2 - 2^{\gamma})} \left[\left(\frac{2}{V(x_*, x_0^0)}\right)^{(\gamma - 1)}  - \left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2\gamma - 2}{\gamma}}\right] 
+       \end{aligned}
+       \end{equation}
+       Таким образом получаем оценки:
+       \begin{equation}
+           \mathcal{O} \left( \frac{4 M^2}{\mu_{\gamma}^2} \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{V(x_*, x_0^0)}{2}\right]}\right) \text{ при } \gamma = 1
+       \end{equation}
+       \begin{equation}
+           \mathcal{O} \left( \frac{8  M^2}{\mu_{\gamma}^2 (2 - 2^{\gamma})} \left[ \left(\frac{2}{V(x_*, x_0^0)}\right)^{(\gamma - 1)}  - \left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2\gamma - 2}{\gamma}} \right]\right) \text{ при } \gamma > 1
+       \end{equation}
+       
+       \iffalse
+           Соотвтиественно при $\gamma > 1$, степень $1 - \gamma$ является отрицательной, потому справедливо следующее изменение оценки \eqref{eq:v_sup}:
+           \begin{equation}
+               V(x_*, x_{min}^p)^{(1 - \gamma)} \geq (\frac{V(x_*, x_0^p)}{2})^{(1 - \gamma)} \geq \frac{V(x_*, x_0^0)^{(1 - \gamma)}}{2^{p(1 - \gamma)} 2^{(1 - \gamma)}}
+           \end{equation}
+           то есть: 
+           \begin{equation}
+               V(x_*, x_0^p)^{(1 - \gamma)} \geq \frac{V(x_*, x_0^0)^{(1 - \gamma)} 2^{(1-\gamma)}}{2^{p(1 - \gamma)} 2^{(1 - \gamma)}} = \frac{V(x_*, x_0^0)^{(1 - \gamma)}}{2^{p(1 - \gamma)}}
+           \end{equation}
+           Используя полученное неравнсво мы получаем следующую оценку для $N_p$:
+           \begin{equation}
+                N_p \geq \frac{2^{\gamma + 1} M^2}{\mu_{\gamma}^2} V(x_*, x_0^p)^{(1 - \gamma)} \geq  \frac{2^{\gamma + 1} M^2}{\mu_{\gamma}^2} \frac{V(x_*, x_0^0)^{(1 - \gamma)}}{2^{p(1 - \gamma)}} = \frac{2 \cdot 2^{\gamma} \cdot 2^{p\gamma} M^2}{2^p \mu_{\gamma}^2} V(x_*, x_0^0)^{(1 - \gamma)}
+           \end{equation}
+           Используя данный подход получим следующую оценку (достаточно завышенную):
+           $$
+               \sum_{k=1}^{p} N_k \geq \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2} V(x_*, x_0^0)^{(1 - \gamma)} (1 + 2^{(\gamma-1)} + 2^{2(\gamma - 1)} + ... + 2^{p(\gamma - 1)}) = \frac{2 \cdot 2^{\gamma} M^2}{\mu_{\gamma}^2} \frac{1 - 2^{p(\gamma-1)}}{1 - 2^{(\gamma-1)}} (V(x_*, x_0^0))^{1 - \gamma}
+           $$
+           Так же отдельно рассмотрим случай $\gamma = 1$:
+           $$
+               \sum_{k=1}^{p} N_k = \frac{4 p M^2}{\mu_{\gamma}^2} 
+           $$
+           Для финальной оценки необходимо получить оценку для количества рестартов $p$, обозначим $\varepsilon := \varepsilon_p$ - то есть финальную, необходимую точность:
+           \begin{equation}
+               \varepsilon = \varepsilon_p = \mu_{\gamma} (\frac{V(x_*, x_0^p)}{2})^{\frac{\gamma}{2}} \leq  \mu_{\gamma} (\frac{V(x_*, x_0^0)}{2^{p+1}})^{\frac{\gamma}{2}}
+           \end{equation}
+           \begin{equation}
+               (\frac{\varepsilon}{\mu_{\gamma}})^{\frac{2}{\gamma}} \leq  \frac{V(x_*, x_0^0)}{2 \cdot 2^p}
+           \end{equation}
+           \begin{equation}
+               (\frac{\varepsilon}{\mu_{\gamma}})^{\frac{2}{\gamma}} \leq  \frac{V(x_*, x_0^0)}{2 \cdot 2^p}
+           \end{equation}
+           Критерий?:
+           \begin{equation}
+               V(x_*, x_0^p) \leq \frac{1}{2} \sum_{k=0}^N \frac{\varepsilon_p^2}{\norm{\nabla f(x_k) }_2^2} \leq \frac{\varepsilon_p^2}{2} \frac{N_p}{M^2}
+           \end{equation}
+       \fi
+    \end{proof}
 
 \FloatBarrier
