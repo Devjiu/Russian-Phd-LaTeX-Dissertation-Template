@@ -2,22 +2,114 @@
 
 \section{Введение}\label{sec:ch3/sect1}
 
-    В предыдущих пунктах уже упоминались пессимистичные теоретические оценки скорости сходимости для негладких задач в пространствах больших размерностей. Распространенным подходом к этой проблеме служит выделение специальных классов задач, таких как условие острого минимума \cite{6, 1} и условие сильной выпуклости. Напомним определение острого минимума. Говорят, что $f$ удовлетворяет условию острого минимума, если
-    \begin{gather}\label{sm}
-    f(x) - f(x_*) \geq \alpha \min_{x_* \in X_*} \|x- x_*\|_2 \quad \forall x \in Q
-    \end{gather}
-    для некоторого фиксированного $\alpha >0$ и $f(x_*) = f^* = \min\limits_{x\in Q} f(x)$ для всякого $x_* \in X_*$, где $Q$ --- выпуклое и замкнутое подмножество $\mathbb{R}^n$, $X_*$ --- компакт и $\|\cdot\|_2$ --- евклидова норма. 
+    В предыдущих пунктах уже упоминались пессимистичные теоретические оценки скорости сходимости для негладких задач в пространствах больших размерностей. Распространенным подходом к этой проблеме служит выделение специальных классов задач, таких как условие острого минимума \cite{6, 1} и условие сильной выпуклости. 
 
-    В финале предыдущей главы было проведено сравнение 2х методов, использующих различные дополнительные условия:
-    \begin{enumerate}
-        \item сильной выпуклости,
-        \item обобщенного условия острого минимума.
-    \end{enumerate}
     На основе проведенного противопоставления указанных выше условий, в данной главе будут предложены рестарты для субградиентных методов, улучшающие полученные ранее оценки благодаря использованию аналога условия острого минимума.  Кроме того, предложена некоторая релаксация для понятия острого минимума, включающая в себя условие квадратичного роста и использующая функцию Брэгмана для оценки удаленности от решения. 
     
     Пункт \ref{sec:ch3/sect3} обобщает использованные в предыдущей главе подходы для уточнения оценок скорости сходимости для сильно выпуклых задач и вводимое условие относительного $\gamma$-роста. В рамках данного пункта получены оценки скорости сходимости по значению и по аргументу функции, улучшающие рассмотренные ранее сублинейные оценки скорости сходимости, предложенные изначально в \cite{Bach_2012}. В последующем пункте \ref{sec:ch3/sect4} предложены улучшения для полученного метода, направленные на удобство его использования. В частности проведена заменена констант, использующих расстояние от начальной точки до точного решения, на их оценки. Также предложен критерий остановки на каждом из рестартов, который может значительно сократить общее количество итераций на практике.
 
-\section{Рестарты для метода зеркального спуска для относительных липшицевых задач оптимизации с относительным гамма-ростом}\label{sec:ch3/sect3}
+ \section{Экспериментальное сравнение скорости сходимости субградиентных методов при условии острого минимума и при условии сильно выпуклой постановки}  \label{sec:ch3/sec2}
+
+    В данном пункте предложен анализ экспериментального сравнения двух субградиентных методов, использующих различные дополнительные условия:
+    \begin{enumerate}
+        \item сильной выпуклости,
+        \item обобщенного условия острого минимума.
+    \end{enumerate}
+    Преимущества и оценки в сильно выпуклой постановке рассматривались ранее в \ref{sec:ch2/sec4} и являются продолжением результатов в \cite{Bach_2012}.
+
+    Приведем без доказательства результат, полученный моими коллегами, (упомянутая ранее теорема 1 из \cite{sharp22}) который необходим для дальнейшего анализа экспериментально полученных результатов. Напомним, что в работе рассматриваются задачи вида
+    \begin{gather}\label{min_q}
+        \min_{x\in Q} f(x),
+    \end{gather}
+    где $Q$ --- выпуклое замкнутое подмножество $\mathbb{R}^{n}$. 
+    \begin{theorem}\label{theorem1}
+        Пусть $f$ --- слабо $\beta$-квазивыпуклая функция, и для задачи \eqref{min_q} с условием \eqref{eq_gen_sharp} используется метод \eqref{orig_2} c шагом
+        $h_k = \dfrac{\beta(f(x_k) - \overline{f})}{\| \nabla f(x_k) \|_2^2}$. Пусть также $\forall i \geq 0$ верно $\alpha^2 \beta^2 \leq 2 \| \nabla f(x_i) \|_2^2$. Тогда верно неравенство:
+        \begin{gather}\label{adaptive_estimate}
+            \begin{aligned}
+            \min_{x_* \in X_*} \|x_{k+1} - x_* \|_2^2 \leq &  \prod_{i=0}^k \left ( 1 - \frac{\alpha^2\beta^2}{2 \| \nabla f(x_i) \|_2^2} \right ) \min_{x_* \in X_*} \|x_0 - x_* \|_2^2 + \\& 
+            \qquad \qquad + \sum_{i=0}^{k-1} \prod_{j=i+1}^k \left ( 1 - \frac{\alpha^2\beta^2}{2 \| \nabla f(x_j) \|_2^2} \right )\Delta_i + \Delta_k,
+            \end{aligned}
+        \end{gather}
+        где $\Delta_k = \frac{\Delta^2}{2 \| \nabla f(x_k) \|_2^2}$ для всякого $k \geqslant 0$.
+    \end{theorem}
+
+    Для сравнения скорости сходимости метода \eqref{orig_2} и полученной в теореме \ref{ThmBachAdaptive} оценки с результатом, полученным моими соавторами, в теореме \ref{theorem1} для задач с $\Delta$-острым минимумом. Напомним определение острого минимума. Говорят, что $f$ удовлетворяет условию острого минимума, если
+    \begin{gather}\label{sm}
+        f(x) - f(x_*) \geq \alpha \min_{x_* \in X_*} \|x- x_*\|_2 \quad \forall x \in Q
+    \end{gather}
+    для некоторого фиксированного $\alpha >0$ и $f(x_*) = f^* = \min\limits_{x\in Q} f(x)$ для всякого $x_* \in X_*$, где $Q$ --- выпуклое и замкнутое подмножество $\mathbb{R}^n$, $X_*$ --- компакт и $\|\cdot\|_2$ --- евклидова норма. 
+    
+    При таком допущении моими соавторами в работе \cite{sharp22} в теореме \ref{theorem1} был предложен субградиентный метод с гарантией  линейной скорости сходимости в случае доступности информации о точном значении $f^*$ \cite{6} без использования в теоретических оценках скорости сходимости  параметра размерности пространства. Условие острого минимума верно, например, для задачи проектирования точки на выпуклый компакт. Однако требование доступности $f^*$ довольно ограничительно. В этой связи рассматривалось некоторое обобщение условия острого минимума
+    \begin{gather}\label{eq_gen_sharp}
+        f(x) - \overline{f} \geq \alpha \min_{x_* \in X_*} \|x - x_* \|_2 - \Delta,
+    \end{gather}
+    где $\overline{f}$  --- это некоторое приближение минимального значения функции $f^*$, причём $\overline{f} \geq f^*$. 
+
+    В данной постановке были проведены численные эксперименты. Поскольку для вышеупомянутых методов требуются различные свойства, то представлены 2 постановки для одной и той же, с геометрической точки зрения, задачи. Задача о наименьшем покрытии точек шаром для $2$-сильно выпуклой функции (уже использовалась ранее \eqref{sphere_cover_strongly})
+    \begin{gather}
+        f(x) := \max_{x\in Q}\left\{\|x - a_0\|_2^2, \|x - a_1\|_2^2, ..., \|x - a_m\|_2^2\right\},
+    \end{gather}
+    а также для не сильно выпуклой (но выпуклой) функции
+    \begin{gather}\label{sphere_cover}
+        f(x) := \max_{x\in Q}\left\{\|x - a_0\|_2, \|x - a_1\|_2, ..., \|x - a_m\|_2\right\}.
+    \end{gather}
+
+    Начнём с иллюстрации преимуществ адаптивной оценки метода \cite{Bach_2012} из теоремы \ref{ThmBachAdaptive}. Будем рассматривать множество Q, которое равно евклидову шару с центром в 0. Начальная точка выбиралась случайно, но внутри Q. На рис. \ref{res_ex_strong_r5} ниже показано поведение и характер убывания для оригинальной оценки (\ref{orig_estimation_f}) --- сплошная линия, адаптивной оценки (\ref{adaptive_estimation_f}) --- штрих-пунктирная линия и непосредственно невязки по функции и по аргументу соответственно --- штриховая линия. На рис. \ref{res_ex_strong_r5} показано поведение глобальной оценки, адаптивной и невязки по функции и аргументу в случае ограниченного $Q \;(R = 5)$. Данный график наглядно демонстрирует, насколько более точной может оказаться адаптивная оценка (\ref{adaptive_estimation_f}) для задачи \eqref{sphere_cover_strongly}. Также показано поведение уже известных оценок (рис. \ref{r_20_q_6}) с учетом логарифмической шкалы для количества итераций.
+
+    \begin{figure}[h]
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{x_discr_rad_5_q_4_it_70_000_dim_1000.png}
+        \endminipage\hfill
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{f_discr_rad_5_q_4_it_70_000_dim_1000.png}
+        \endminipage\hfill
+        \caption{Результаты решения задачи минимизации \eqref{sphere_cover_strongly}, учитывающей сильную выпуклость, где  $n= 1\,000, r = 5$ и  шар $Q$ радиуса 4.}
+        \label{res_ex_strong_r5}
+    \end{figure}
+
+    Теперь перейдём к выпуклой постановке \eqref{sphere_cover} с целью исследования эффективности предложенного в теореме \ref{theorem1} субградиентного метода с $\Delta$-острым минимумом. К существующему набору точек, представленных для покрытия, с известным значением центра добавим дополнительную точку, которая находится вне исходного шара достаточно близко к границе (удалена не более, чем на $\Delta > 0$). Данный подход позволяет оценить <<приближённое>> значение минимума $\overline{f}$, что позволит применить указанный вариант субградиентного метода с $\Delta$-острым минимумом. При этом новое значение минимума останется внутри исходной сферы. Поскольку оптимальное значение функции --- это радиус искомого шара, покрывающего все точки, а $x_*$ всегда будет расположена внутри него, то для всякого $x$ верно неравенство $ f(x) \geq \| x - x_*\|_2$. Рассмотрим целевую функцию вида
+    \begin{gather}\label{allpha_sphere_cover}
+        f(x) := \alpha \max_{x\in Q}\{\|x - a_0\|_2, \|x - a_1\|_2, ..., \|x - a_m\|_2\}.
+    \end{gather}
+    Тогда значение $\Delta$ можно оценить  из (\ref{eq_gen_sharp}): 
+        $f(x) - \overline{f} \geq \alpha\|x- x_*\|_2 - \Delta, \quad \Delta \geq \overline{f}$.
+
+    Отметим, что данная постановка значительно влияет на величину теоретической оценки качества решения (\ref{adaptive_estimate}) для метода \eqref{orig_2}.
+    Наиболее значимый вклад в оценку (\ref{adaptive_estimate}) дает последнее слагаемое $\frac{\Delta^2}{2\|\nabla f(x_k)\|^2_2}$, причём 
+    $     \Delta \sim \overline{f} \sim \alpha \|\overline{x}-a\|_2 $ и 
+    $     \|\nabla f(x_k)\|_2 = \alpha $. Поэтому последнее слагаемое пропорционально радиусу шара, соответствующему <<приближённому>> решению. Это и подтверждается экспериментально. Для сравнения, ниже на рис. \ref{res_sharp_convex} и \ref{res_strong_convex} приведены результаты работы для того же набора входных точек, которые необходимо покрыть в обоих постановках, (\ref{allpha_sphere_cover}) и (\ref{sphere_cover_strongly}). Начальная точка также одна и та же. Сравниваются методы из теорем \ref{theorem1} и \ref{ThmBachAdaptive}. Первый из этих методов обеспечивает сходимость буквально за 10 итераций к <<приближённому>> решению с заданной точностью и даже позволяет эту точность повысить. Второй же метод достигает схожих (с геометрической точки зрения) результатов за значительно большее количество итераций, однако он позволяет повышать точность приближённого решения на дальнейших итерациях.
+
+    Подтверждение данного теоретического наблюдения хорошо иллюстрируется на рис. \ref{res_sharp_convex} и \ref{res_strong_convex}. На рис. \ref{res_sharp_convex} показано поведение субградиентного спуска, использующего $\Delta$-острый минимум (теорема \ref{theorem1}), а именно  быстрая сходимость к <<приближенному>> решению. Штрих-пунктирная линия соответствует оценке \eqref{eq_gen_sharp}, а штриховая --- невязке по функции и аргументу. На рис. \ref{res_strong_convex} показано поведение метода для той же задачи, но с использованием сильно выпуклого целевого функционала (теорема \ref{ThmBachAdaptive}). Скорость убывания уже не столь высокая, но точность получаемого решения в итоге выше. Сплошная линия --- это глобальная оценка \eqref{orig_estimation_f}, штрих-пунктирная --- адаптивная \eqref{adaptive_estimation_f}, а штриховая --- невязка по функции и аргументу.
+
+    \begin{figure}[h]
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{sharp_convex_x.png}
+        \endminipage\hfill
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{sharp_convex_f.png}
+        \endminipage\hfill
+        \caption{ Результаты решения задачи минимизации (\ref{allpha_sphere_cover}), учитывающей условие острого минимума, где  $n= 1\,000, r = 0.7525, \alpha = 0.6$.}
+        \label{res_sharp_convex}
+    \end{figure}
+
+    \begin{figure}[h]
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{strong_convex_small_rad_x.png}
+        \endminipage\hfill
+        \minipage{0.49\textwidth}
+        \includegraphics[width=\linewidth]{strong_convex_small_rad_f.png}
+        \endminipage\hfill
+        \caption{ Результаты решения задачи минимизации (\ref{sphere_cover_strongly}), учитывающей сильную выпуклость, где  $n= 1\,000, r = 0.7525$.}
+        \label{res_strong_convex}
+    \end{figure}
+
+    Тем не менее, сравнение с известным точным решением $x_*$, а также график динамики значения целевой функции показывает, что за малое число шагов (значительно меньшее, чем для метода \eqref{orig_2}) реализация метода, описанного в теореме \ref{theorem1}, приводит к неплохому качеству приближённого решения. При этом, однако, для метода, учитывающего $\Delta$-острую постановку, после достижения такого уровня дальнейшее повышение качества выходной точки в отличие от метода \eqref{orig_2} уже не наблюдается. 
+
+    Данные результаты привели к идее объединения данных подходов для достижения лучших результатов в скорости сходимости без потери возможности дальнейшего повышения точности.
+
+\section{Рестарты для метода зеркального спуска на классе относительных липшицевых задач минимизации функций, удовлетворяющих условию относительного гамма-роста}\label{sec:ch3/sect3}
+    Механика рестартов является достаточно популярным направлением для улучшения оценок скорости сходимости при дополнительных условиях. Часто в качестве дополнительного условия выступает именно упомянутое ранее условие острого минимума (см. например \cite{sharp_rest} или часть посвященную рестартам в \cite{sharp22}).
     Воспользуемся следующим результатом, показанным в формуле (6) в работе \cite{Lu_2018}:
     \begin{theorem} \label{vanilla_mirror}
         Пусть $f$ --- является $M$-липшицевой на $Q$ относительно некоторой функции Брэгмана $V(x, y)$ c сильно выпуклой прокс-функцией $d(x)$. Тогда можно задать метод следующим образом:
@@ -38,10 +130,10 @@
         \end{equation}
         то можно выписать такую оценку скорости сходимости:
         \begin{equation} \label{mirr_est}
-            f(\widehat{x_N}) - f(x_*) \leq \frac{M\sqrt{2 \left[\min\limits_{x_* \in X_*}{V(x_*, x_0)}\right]}}{\sqrt{N}}
+            f(\widehat{x_N}) - f(x_*) \leq \frac{M\sqrt{2 \left[\min\limits_{x_* \in X_*}{V(x_*, x_0)}\right]}}{\sqrt{N}}.
         \end{equation}
     \end{remark}
-    Если функция обладает дополнительными свойствами, аналогичными <<острому минимуму>>,  то становится возможным применение техники рестартов. Используем аналог данного условия и вслед за Шапиро–Немировским (см. \cite{shapiro_2005} и \cite{shapiro_2021} ) впервые введем условие относительного $\gamma$-роста ($\gamma \geq 1$). Отметим, что подобное условие впервые вводится с использованием дивергенции Брэгмана, что позволяет обобщить ряд условий, таких как условия <<острого минимума>>, <<квадратичного доминирования>> и <<$\gamma$-роста>>:
+    Если функция обладает дополнительными свойствами, аналогичными острому минимуму,  то становится возможным применение техники рестартов. Используем аналог данного условия и вслед за Шапиро–Немировским (см. \cite{shapiro_2005} и \cite{shapiro_2021} ) впервые введем условие относительного $\gamma$-роста ($\gamma \geq 1$). Отметим, что подобное условие впервые вводится с использованием дивергенции Брэгмана, что позволяет обобщить ряд условий, таких как условия острого минимума, квадратичного доминирования и $\gamma$-роста.
     \begin{definition}
        $f$ --- удовлетворяет условию относительного $\gamma$-роста при условии:
        \begin{equation} \label{gamma-growth}
@@ -202,7 +294,7 @@
        $$
            \sum_{k=1}^{p} N_k = \ceil*{\frac{2 p M^2}{\mu_{\gamma}^2}} \geq \frac{2 M^2}{\mu_{\gamma}^2} \log_2{\left[\frac{\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}}{\varepsilon}\right]}
        $$
-       Таким образом получаем следующие оценки для количества итераций, необходимых чтобы достичь заданной точности:
+       Таким образом, получаем следующие оценки для количества итераций, необходимых, чтобы достичь заданной точности:
        $$
            \mathcal{O} \left(\frac{2 M^2}{\mu_{\gamma}^2} \log_2{\frac{\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}}{\varepsilon}}\right) \text{ при } \gamma = 1
        $$
@@ -214,9 +306,9 @@
             f(\widehat{x_p}) - f(x_*) \leq  \langle \nabla f(\widehat{x_p}), \widehat{x_p} - x_* \rangle \leq M \sqrt{ 2 \left[\min_{x_* \in X_*}{V(x_*, \widehat{x_p})}\right]} \leq M \sqrt{2 \varepsilon}.  
         $$
     \end{proof}
-    Также путем замены $\delta := M \sqrt{2 \varepsilon}$ в предыдущей теореме, можно сформулировать следующее замечание:
+    Также путем замены $\delta := M \sqrt{2 \varepsilon}$ в предыдущей теореме можно сформулировать следующее замечание:
     \begin{remark}
-        Пусть $f$ --- удовлетворяет условию $\gamma$-роста \eqref{gamma-growth} и также является $M$-липшицевой на $Q$ относительно некоторой дивергенции Брэгмана $V(x, y)$. В таком случае, Алгоритм \ref{alg:rest_gamma} достигнет точности $\delta$ за:
+        Пусть $f$ --- удовлетворяет условию $\gamma$-роста \eqref{gamma-growth} и также является $M$-липшицевой на $Q$ относительно некоторой дивергенции Брэгмана $V(x, y)$. В таком случае Алгоритм \ref{alg:rest_gamma} достигнет точности $\delta$ за
         \begin{equation}
             \begin{aligned}
                N = \mathcal{O}\left(\frac{2 M^2}{\mu_{\gamma}^2} \log_2{\frac{2 M^2 \left[\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right]}{\delta^2}}\right) \text{ при } \gamma = 1, \\
@@ -237,14 +329,14 @@
 
     Для дальнейших рассуждений необходим адаптивный аналог оценки \eqref{general_est}. Воспользуемся результатом, полученным в лемме \ref{th:base}, а точнее в замечании \ref{remark4} к этой лемме. При помощи данного результата проведем замену глобальной константы $M$ на локальные значения в теореме \ref{vanilla_mirror}. Сформулируем и докажем следующее соответствующее данному подходу замечание:
     \begin{remark} \label{adapt_mirror}
-        Пусть $f$ --- является $M$-липшицевой на $Q$ относительно некоторой функции Брэгмана $V(x, y)$ c 1-сильно выпуклой прокс-функцией $d(x)$.
+        Пусть $f$ является $M$-липшицевой на $Q$ относительно некоторой функции Брэгмана $V(x, y)$ c 1-сильно выпуклой прокс-функцией $d(x)$.
         Зададим метод аналогично теореме \ref{vanilla_mirror}: 
         \begin{equation} \label{adapt_upd}
             x_{k+1} = \arg \min_{x \in Q} {\left[ f(x_k) + \langle \nabla f(x_k), x - x_k \rangle + \frac{1}{h_k} V(x, x_k)\right]},
         \end{equation}
         где $\{ h_k \}$ - последовательность размеров шагов. Тогда справедлива следующая оценка:
         \begin{equation} \label{adapt_est}
-            \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} }{\sum_{k=0}^N h_k}.
+            \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_2} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} }{\sum_{k=0}^N h_k}.
         \end{equation}
     \end{remark}
 
@@ -252,56 +344,61 @@
        Пусть алгоритм \eqref{adapt_upd} отработал $N$ шагов, тогда просуммируем неравенства \eqref{base_eq} (из замечания \ref{remark4}):
        $$
        \begin{aligned}
-           h_k (f(x_k) - f(x_*)) \leq h_k \langle g(x_k), x_k - x_* \rangle \leq \frac{h_k^2}{2} \norm{g(x_k)}^2 + \min\limits_{x_* \in X_*}{V(x_*, x_k)} - \\
+           h_k (f(x_k) - f(x_*)) \leq h_k \langle \nabla f(x_k), x_k - x_* \rangle \leq \frac{h_k^2}{2} \norm{\nabla f(x_k)}^2_2 + \min\limits_{x_* \in X_*}{V(x_*, x_k)} - \\
            - \min\limits_{x_* \in X_*}{V(x_*, x_{k+1})}
        \end{aligned}
        $$
        $$
-           \sum_{k=0}^N h_k (f(x_k) - f(x_*)) \leq \sum_{k=0}^N \frac{h_k^2}{2} \norm{g(x_k)}^2 + \sum_{k=0}^N (\min\limits_{x_* \in X_*}{V(x_*, x_k)} - \min\limits_{x_* \in X_*}{V(x_*, x_{k+1})})
+           \sum_{k=0}^N h_k (f(x_k) - f(x_*)) \leq \sum_{k=0}^N \frac{h_k^2}{2} \norm{\nabla f(x_k)}^2 + \sum_{k=0}^N (\min\limits_{x_* \in X_*}{V(x_*, x_k)} - \min\limits_{x_* \in X_*}{V(x_*, x_{k+1})})
        $$
        $$
        \begin{aligned}
-           \frac{\sum_{k=0}^N h_k f(x_k)} {\sum_{k=0}^N h_k} - f(x_*) \leq & \frac{\sum_{k=0}^N h_k^2 \norm{g(x_k)}^2} {2 \sum_{k=0}^N h_k} + \\
+           \frac{\sum_{k=0}^N h_k f(x_k)} {\sum_{k=0}^N h_k} - f(x_*) \leq & \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2} {2 \sum_{k=0}^N h_k} + \\
            & + \frac{\sum_{k=0}^N \left(\min\limits_{x_* \in X_*}{V(x_*, x_k)} - \min\limits_{x_* \in X_*}{V(x_*, x_{k+1})}\right)}{\sum_{k=0}^N h_k}
        \end{aligned}
        $$
        И, наконец,
        $$
-           \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{g(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} - \min\limits_{x_* \in X_*}{V(x_*, x_N)} }{\sum_{k=0}^N h_k} \leq
+           \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_2} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} - \min\limits_{x_* \in X_*}{V(x_*, x_N)} }{\sum_{k=0}^N h_k} \leq
        $$
        $$
-           \leq \frac{\sum_{k=0}^N h_k^2 \norm{g(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)}}{\sum_{k=0}^N h_k}
+           \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_2} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)}}{\sum_{k=0}^N h_k}.
        $$
     \end{proof}
-    На практике для использования приведенной выше теоремы \ref{simple_restart} требуется знание о точном решении для оценки $\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}$, что лишает данный метод практической пользы. Потому стоит провести замену расстояния Брэгмана оценкой сверху:
+    На практике для использования приведенной выше теоремы \ref{simple_restart} требуется знание о точном решении для оценки $\min\limits_{x_* \in X_*}{V(x_*, x_0)}$, что лишает данный метод практической пользы. 
+    
+    
+    Введем $\Theta$ как мажорирующую константу для $\min\limits_{x_* \in X_*}{V(x_*, x_0)}$, что формально описывается
+    $$
+        \Theta \geq \min\limits_{x_* \in X_*}{V(x_*, x_0)}.
+    $$
+    Таким образом, можно продолжить замечание \ref{adapt_mirror} заменой расстояния Брэгмана оценкой сверху:
     \begin{equation} \label{adapt_est_theta}
     \begin{aligned}
-        \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} }{\sum_{k=0}^N h_k} \leq \\
-        \leq \frac{\sum_{k=0}^N h_k^2 \norm{g(x_k)}^2} {2 \sum_{k=0}^N h_k} + \frac{\Theta^2}{\sum_{k=0}^N h_k}.
+        \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_2} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} }{\sum_{k=0}^N h_k} \leq \\
+        \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_2} {2 \sum_{k=0}^N h_k} + \frac{\Theta^2}{\sum_{k=0}^N h_k}.
     \end{aligned}
     \end{equation}
-    Используем данный результат и предложим следующую модификацию, использующая критерий остановки метода на каждом из рестартов.
+    Используем данный результат и предложим следующий критерий остановки.
     \begin{remark}
         Если в \eqref{adapt_upd} выбрать шаг следующим образом:
         \begin{equation} \label{eps_step}
-            h_{k} = \frac{\varepsilon}{\norm{\nabla f(x_k)}^2},
+            h_{k} = \frac{\varepsilon}{\norm{\nabla f(x_k)}^2_2},
         \end{equation}
-        и воспользоваться критерием остановки метода на рестарте: 
+        и воспользоваться критерием остановки метода: 
         \begin{equation} \label{stop_crit}
-            \sum_{k=0}^N \frac{1} {\norm{\nabla f(x_k)}^2} \geq \frac{2 \Theta^2}{\varepsilon^2}, \;\;\;\;\text{ где } \Theta \geq \min\limits_{x_* \in X_*}{V(x_*, x_0)},
+            \sum_{k=0}^N \frac{1} {\norm{\nabla f(x_k)}^2_2} \geq \frac{2 \Theta^2}{\varepsilon^2}, \;\;\;\;\text{ где } \Theta \geq \min\limits_{x_* \in X_*}{V(x_*, x_0)},
         \end{equation}
-        тогда для невязки по функции можно провести следующую последовательность сравнений:
+        тогда для невязки по функции можно показать следующее (прямое следствие \eqref{adapt_est_theta}):
         \begin{equation} 
         \begin{aligned}
-            \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N \frac{\varepsilon^2}{\norm{\nabla f(x_k)}^4} \norm{\nabla f(x_k)}^2} {2 \sum_{k=0}^N \frac{\varepsilon}{\norm{\nabla f(x_k)}^2}} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} }{\sum_{k=0}^N \frac{\varepsilon}{\norm{\nabla f(x_k)}^2}} = \\
-            = \frac{\varepsilon} {2} \frac{ \sum_{k=0}^N \frac{1}{\norm{\nabla f(x_k)}^2}} {\sum_{k=0}^N \frac{1} {\norm{\nabla f(x_k)}^2}} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)}}{\varepsilon \sum_{k=0}^N \frac{1} {\norm{\nabla f(x_k)}^2}}  = \frac{\varepsilon}{2} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} }{\varepsilon \sum_{k=0}^N \frac{1} {\norm{\nabla f(x_k)}^2}} \leq \\
-            \leq \frac{\varepsilon}{2} + \frac{\Theta^2}{\varepsilon \sum_{k=0}^N \frac{1} {\norm{\nabla f(x_k)}^2}} \leq \varepsilon.
+            \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\varepsilon}{2} + \frac{\Theta^2}{\varepsilon \sum_{k=0}^N \frac{1} {\norm{\nabla f(x_k)}^2_2}} \leq \varepsilon.
         \end{aligned}
         \end{equation}
      \end{remark}
      В дальнейших рассуждениях будем обозначать 
      \[
-        x_{min}^j  := \min_{0\leq k \leq N} f(x_k) \;\;\; \text{на} \;\; j\text{-м рестарте}.
+        x_{min}^j  := \argmin_{0\leq k \leq N} f(x_k) \;\;\; \text{на} \;\; j\text{-м рестарте}.
      \]
 
      \begin{algorithm}[htp]
@@ -318,14 +415,15 @@
         }
     \end{algorithm}
     \begin{theorem}
-        Пусть $f$ --- удовлетворяет условию $\gamma$-роста \eqref{gamma-growth} и также является $M$-липшицевой на $Q$ относительно некоторой функции Брэгмана $V(x, y)$. В таком случае Алгоритм \ref{alg:rest_criteria} достигнет точности $\varepsilon$ за:
+        Пусть $f$ удовлетворяет условию $\gamma$-роста \eqref{gamma-growth} и также является $M$-липшицевой на $Q$ относительно некоторой функции Брэгмана $V(x, y)$. В таком случае Алгоритм \ref{alg:rest_criteria} достигнет точности $\varepsilon$ за
         \begin{equation}
            N = \mathcal{O} \left( \frac{4 M^2}{\mu_{\gamma}^2} \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{\Theta_0^2}{2}\right]}\right) \text{ при } \gamma = 1
        \end{equation}
        или
        \begin{equation}
-           N = \mathcal{O}\left( \frac{2 M^2 }{2^{\gamma - 1} - 1}\left[ \frac{2}{\mu_{\gamma}^{\frac{2}{\gamma}}}\varepsilon^{\frac{2}{\gamma} - 2} - \frac{2^{\gamma}}{\mu_{\gamma}^2 \Theta_0^{2(\gamma - 1)}} \right] \right) \text{ при } \gamma > 1.
+           N = \mathcal{O}\left( \frac{2 M^2 }{2^{\gamma - 1} - 1}\left[ \frac{2}{\mu_{\gamma}^{\frac{2}{\gamma}}}\varepsilon^{\frac{2}{\gamma} - 2} - \frac{2^{\gamma}}{\mu_{\gamma}^2 \Theta_0^{2(\gamma - 1)}} \right] \right) \text{ при } \gamma > 1,
        \end{equation}
+       где $\Theta_0$ --- это оценка сверху для $\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}$.
     \end{theorem}
 
     \begin{proof}
@@ -333,7 +431,7 @@
        $$
            \min\limits_{x_* \in X_*}{V(x_*, x_0^0)} \leq \Theta_0^2
        $$
-       Поскольку начальный $\varepsilon_0$ является произвольным - выберем его следующим образом:
+       Поскольку начальный $\varepsilon_0$ является произвольным, выберем его следующим образом:
        $$
        \begin{aligned}
            \mu_{\gamma}\left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)}\right)^{\gamma/2} \leq f(x_{min}^0) - f(x_*) \leq \mu_{\gamma}\left(\frac{\min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)}}{2}\right)^{\gamma/2} \leq \\
@@ -345,7 +443,7 @@
        \]
        Такой выбор $\varepsilon_0$ не нарушает требований по заданной точности $\varepsilon$. Метод выстроен так, что можно показать следующее:
        \[
-           \varepsilon_0 = \varepsilon \cdot \left(\sqrt{2}\right)^{p\gamma}
+           \varepsilon_0 = \varepsilon \cdot \left(\sqrt{2}\right)^{p\gamma}.
        \]
        Таким образом:
        $$
@@ -355,11 +453,11 @@
            \left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)}\right)^{\gamma} \leq \frac{\Theta_0^{2\gamma}}{2^{\gamma}}
        $$
        $$
-           \left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)}\right)^{\gamma} \leq \left(\frac{\Theta_0^2}{2}\right)^{\gamma}
+           \left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)}\right)^{\gamma} \leq \left(\frac{\Theta_0^2}{2}\right)^{\gamma}.
        $$
        Поскольку $\gamma \geq 1$:
        $$
-           \min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)} \leq \frac{\Theta_0^2}{2}
+           \min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)} \leq \frac{\Theta_0^2}{2}.
        $$
        Критерий остановки:
        \begin{equation} \label{krit}
@@ -367,26 +465,26 @@
        \end{equation}
        Если $\norm{\nabla f(x_k) }_2 \leq M$, то
        \[
-           \sum_{k=0}^{N_0} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{N_0}{M^2}
+           \sum_{k=0}^{N_0} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{N_0}{M^2}.
        \]
-       Значит критерий остановки \eqref{krit} будет заведомо выполнен при:
+       Значит критерий остановки \eqref{krit} будет заведомо выполнен при
        \[
-            \sum_{k=0}^{N_0} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{N_0}{M^2} \geq \frac{2^{\gamma + 1}}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2}}
+            \sum_{k=0}^{N_0} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{N_0}{M^2} \geq \frac{2^{\gamma + 1}}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2}},
        \]
        соответственно:
        $$
-            N_0 \geq \frac{2^{\gamma + 1} M^2}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2}}
+            N_0 \geq \frac{2^{\gamma + 1} M^2}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2}}.
        $$
        Аналогично продолжая рассуждение для второго рестарта:
        \[
-           \min\limits_{x_* \in X_*}{V(x_*, x_{0}^1)} \leq \Theta_1^2
+           \min\limits_{x_* \in X_*}{V(x_*, x_{0}^1)} \leq \Theta_1^2,
        \]
        \[
-           \min\limits_{x_* \in X_*}{V(x_*, x_{0}^2)} = \min\limits_{x_* \in X_*}{V(x_*, x_{min}^1)} \leq \frac{\Theta_1^2}{2}
+           \min\limits_{x_* \in X_*}{V(x_*, x_{0}^2)} = \min\limits_{x_* \in X_*}{V(x_*, x_{min}^1)} \leq \frac{\Theta_1^2}{2},
        \]
        и для третьего перезапуска:
        \[
-           \min\limits_{x_* \in X_*}{V(x_*, x_{0}^2)} \leq \Theta_2^2
+           \min\limits_{x_* \in X_*}{V(x_*, x_{0}^2)} \leq \Theta_2^2.
        \]
        Таким образом:
        \[
@@ -403,26 +501,26 @@
        \]
        Проведем те же рассуждения в общем виде для $p$-го рестарта:
        \[
-           \varepsilon_p = \mu_{\gamma} \left(\frac{\Theta_p^2}{2}\right)^{\frac{\gamma}{2}} = \mu_{\gamma} \left(\frac{\Theta_0^2}{2^{p+1}}\right)^{\frac{\gamma}{2}}
+           \varepsilon_p = \mu_{\gamma} \left(\frac{\Theta_p^2}{2}\right)^{\frac{\gamma}{2}} = \mu_{\gamma} \left(\frac{\Theta_0^2}{2^{p+1}}\right)^{\frac{\gamma}{2}},
        \]
        тогда аналогично: 
        \[
-           \mu_{\gamma}\left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^p)}\right)^{\frac{\gamma}{2}} \leq f(x_{min}^p) - f(x_*) \leq \varepsilon_p
+           \mu_{\gamma}\left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^p)}\right)^{\frac{\gamma}{2}} \leq f(x_{min}^p) - f(x_*) \leq \varepsilon_p.
        \]
        Откуда получаем:
        \[
-           \min\limits_{x_* \in X_*}{V(x_*, x_{min}^{p})} \leq \frac{\Theta_0^2}{2^{p+1}}
+           \min\limits_{x_* \in X_*}{V(x_*, x_{min}^{p})} \leq \frac{\Theta_0^2}{2^{p+1}}.
        \]
-       Соответствующий критерий остановки:
+       Соответствующий критерий остановки
        \[
-           \sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{2 \Theta_p^2}{\varepsilon_p^2} = \frac{2 \Theta_0^2}{{2^p \mu_{\gamma}^2 \frac{ \Theta_0^{2\gamma}}{2^{\gamma(p + 1)}}}} = \frac{1}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} 2^{(p - \gamma p - \gamma - 1)}}
+           \sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{2 \Theta_p^2}{\varepsilon_p^2} = \frac{2 \Theta_0^2}{{2^p \mu_{\gamma}^2 \frac{ \Theta_0^{2\gamma}}{2^{\gamma(p + 1)}}}} = \frac{1}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} 2^{(p - \gamma p - \gamma - 1)}},
        \]
-       и заведомо выполнен при:
+       и заведомо выполнен при
        \[
            \sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{N_p}{M^2} \geq \frac{1}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} 2^{(p - \gamma p - \gamma - 1)}}
        \]
        \[
-           N_p \geq \frac{M^2}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} 2^{(p - \gamma p - \gamma - 1)}} = \frac{M^2 2^{(\gamma + 1)}}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} } 2^{p(\gamma - 1)}
+           N_p \geq \frac{M^2}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} 2^{(p - \gamma p - \gamma - 1)}} = \frac{M^2 2^{(\gamma + 1)}}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} } 2^{p(\gamma - 1)}.
        \]
        \iffalse
        Используя полученное неравенство мы получаем следующую оценку для $N_p$:
@@ -434,14 +532,14 @@
        \[
         \begin{aligned}
            \sum_{k=0}^{p} N_k \geq \frac{M^2 2^{(\gamma + 1)}}{\mu_{\gamma}^2 \Theta_0^{2(\gamma - 1)} } (1 + 2^{(\gamma-1)} + 2^{2(\gamma - 1)} + ... + 2^{p(\gamma - 1)}) = \\
-           = \frac{M^2 2^{(\gamma + 1)}}{\mu_{\gamma}^2 \Theta_0^{2(\gamma - 1)}} \frac{1 - 2^{p(\gamma-1)}}{1 - 2^{(\gamma-1)}}
+           = \frac{M^2 2^{(\gamma + 1)}}{\mu_{\gamma}^2 \Theta_0^{2(\gamma - 1)}} \frac{1 - 2^{p(\gamma-1)}}{1 - 2^{(\gamma-1)}}.
        \end{aligned}
        \]
        Так же отдельно рассмотрим случай $\gamma = 1$:
        \[
-           \sum_{k=0}^{p} N_k = \ceil*{\frac{4 p M^2}{\mu_{\gamma}^2}}
+           \sum_{k=0}^{p} N_k = \ceil*{\frac{4 p M^2}{\mu_{\gamma}^2}}.
        \]
-       Для финальной оценки необходимо получить оценку для количества рестартов $p$, обозначим $\varepsilon := \varepsilon_p$ - то есть финальную, необходимую точность:
+       Для финальной оценки необходимо получить оценку для количества рестартов $p$, обозначим $\varepsilon := \varepsilon_p$, то есть финальную, необходимую точность:
        \[
            \varepsilon = \varepsilon_p = \mu_{\gamma} \left(\frac{\Theta_0^2}{2^{p+1}}\right)^{\frac{\gamma}{2}}
        \]
@@ -454,7 +552,7 @@
        \[
             p \geq \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{\Theta_0^2}{2}\right]}
        \]
-       Соответственно при $\gamma > 1$:
+       Соответственно, при $\gamma > 1$:
        \[
        \begin{aligned}
            \sum_{k=0}^{p} N_k \geq & \frac{M^2 2^{(\gamma + 1)}}{\mu_{\gamma}^2 \Theta_0^{2(\gamma - 1)}} \frac{1 - 2^{p(\gamma-1)}}{1 - 2^{(\gamma-1)}} \geq \\
@@ -468,12 +566,12 @@
        \[
            \sum_{k=0}^{p} N_k = \ceil*{\frac{4 p M^2}{\mu_{\gamma}^2}} \geq \frac{4 M^2}{\mu_{\gamma}^2} \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{\Theta_0^2}{2}\right]}
        \]
-       Таким образом получаем следующие оценки общего количества обращений к оракулу:
+       Таким образом, получаем следующие оценки общего количества обращений к оракулу:
        \[
            \mathcal{O} \left( \frac{4 M^2}{\mu_{\gamma}^2} \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{\Theta_0^2}{2}\right]}\right) \text{ при } \gamma = 1
        \]
        \[
-           \mathcal{O} \left( \frac{2 M^2 }{2^{\gamma - 1} - 1}\left[ \frac{2}{\mu_{\gamma}^{\frac{2}{\gamma}}}\varepsilon^{\frac{2}{\gamma} - 2} - \frac{2^{\gamma}}{\mu_{\gamma}^2 \Theta_0^{2(\gamma - 1)}} \right] \right) \text{ при } \gamma > 1
+           \mathcal{O} \left( \frac{2 M^2 }{2^{\gamma - 1} - 1}\left[ \frac{2}{\mu_{\gamma}^{\frac{2}{\gamma}}}\varepsilon^{\frac{2}{\gamma} - 2} - \frac{2^{\gamma}}{\mu_{\gamma}^2 \Theta_0^{2(\gamma - 1)}} \right] \right) \text{ при } \gamma > 1 .
        \]
        
        \iffalse
@@ -514,5 +612,5 @@
        \fi
     \end{proof}
 
-    Полученный результат имеет схожие оценки с предыдущей теоремой \ref{simple_restart}, однако на практике критерий остановки значительно сокращает количество итераций, необходимых для достижения заданной точности $\varepsilon$. Также при помощи данного метода легко прогнозируется точность перед каждым рестартом метода, что удобно для контроля за правильностью работы метода. Также подобная информация позволяет переключаться между несколькими модификациями метода, чередуя не только <<эффективные>> и <<аналитические>> шаги, но и перезапуски.  
+    Полученный результат имеет схожие оценки с предыдущей теоремой \ref{simple_restart}, однако на практике критерий остановки значительно сокращает количество итераций, необходимых для достижения заданной точности $\varepsilon$. Также при помощи данного метода легко прогнозируется точность перед каждым рестартом метода, что удобно для контроля за правильностью работы метода. Также подобная информация позволяет переключаться между несколькими модификациями метода, изменяющими, например, параметр $\Theta_0$. Оптимизация данного параметра позволит улучшить оценки без модификации самого метода, что позволит встроить его в более комплексные адаптивные фреймворки в дальнейшем. 
 \FloatBarrier
