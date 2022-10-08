@@ -8,7 +8,7 @@
     
     Пункт \ref{sec:ch3/sect3} обобщает использованные в предыдущей главе подходы для уточнения оценок скорости сходимости для сильно выпуклых задач и вводимое условие относительного $\gamma$-роста. В рамках данного пункта получены оценки скорости сходимости по значению и по аргументу функции, улучшающие рассмотренные ранее сублинейные оценки скорости сходимости, предложенные изначально в \cite{Bach_2012}. В последующем пункте \ref{sec:ch3/sect4} предложены улучшения для полученного метода, направленные на удобство его использования. В частности проведена заменена констант, использующих расстояние от начальной точки до точного решения, на их оценки. Также предложен критерий остановки на каждом из рестартов, который может значительно сократить общее количество итераций на практике.
 
- \section{Экспериментальное сравнение скорости сходимости субградиентных методов при условии острого минимума и при условии сильно выпуклой постановки}  \label{sec:ch3/sec2}
+ \section{Экспериментальное сравнение скорости сходимости для задачи поиска покрывающего шара наименьшего радиуса двух субградиентных методов при различных дополнительных условиях}  \label{sec:ch3/sec2}
 
     В данном пункте предложен анализ экспериментального сравнения двух субградиентных методов, использующих различные дополнительные условия:
     \begin{enumerate}
@@ -23,12 +23,12 @@
     \end{gather}
     где $Q$ --- выпуклое замкнутое подмножество $\mathbb{R}^{n}$. 
     \begin{theorem}\label{theorem1}
-        Пусть $f$ --- слабо $\beta$-квазивыпуклая функция, и для задачи \eqref{min_q} с условием \eqref{eq_gen_sharp} используется метод \eqref{orig_2} c шагом
-        $h_k = \dfrac{\beta(f(x_k) - \overline{f})}{\| \nabla f(x_k) \|_2^2}$. Пусть также $\forall i \geq 0$ верно $\alpha^2 \beta^2 \leq 2 \| \nabla f(x_i) \|_2^2$. Тогда верно неравенство:
+        Пусть $f$ --- выпуклая функция, и для задачи \eqref{min_q} с условием \eqref{eq_gen_sharp} используется метод \eqref{orig_2} c шагом
+        $h_k = \dfrac{f(x_k) - \overline{f}}{\| \nabla f(x_k) \|_2^2}$. Пусть также $\forall i \geq 0$ верно $\alpha^2 \leq 2 \| \nabla f(x_i) \|_2^2$. Тогда верно неравенство:
         \begin{gather}\label{adaptive_estimate}
             \begin{aligned}
-            \min_{x_* \in X_*} \|x_{k+1} - x_* \|_2^2 \leq &  \prod_{i=0}^k \left ( 1 - \frac{\alpha^2\beta^2}{2 \| \nabla f(x_i) \|_2^2} \right ) \min_{x_* \in X_*} \|x_0 - x_* \|_2^2 + \\& 
-            \qquad \qquad + \sum_{i=0}^{k-1} \prod_{j=i+1}^k \left ( 1 - \frac{\alpha^2\beta^2}{2 \| \nabla f(x_j) \|_2^2} \right )\Delta_i + \Delta_k,
+            \min_{x_* \in X_*} \|x_{k+1} - x_* \|_2^2 \leq &  \prod_{i=0}^k \left ( 1 - \frac{\alpha^2}{2 \| \nabla f(x_i) \|_2^2} \right ) \min_{x_* \in X_*} \|x_0 - x_* \|_2^2 + \\& 
+            \qquad \qquad + \sum_{i=0}^{k-1} \prod_{j=i+1}^k \left ( 1 - \frac{\alpha^2}{2 \| \nabla f(x_j) \|_2^2} \right )\Delta_i + \Delta_k,
             \end{aligned}
         \end{gather}
         где $\Delta_k = \frac{\Delta^2}{2 \| \nabla f(x_k) \|_2^2}$ для всякого $k \geqslant 0$.
@@ -108,11 +108,11 @@
 
     Данные результаты привели к идее объединения данных подходов для достижения лучших результатов в скорости сходимости без потери возможности дальнейшего повышения точности.
 
-\section{Рестарты для метода зеркального спуска на классе относительных липшицевых задач минимизации функций, удовлетворяющих условию относительного гамма-роста}\label{sec:ch3/sect3}
+\section{Рестарты зеркального спуска для липшицевых задач, удовлетворяющих условию относительного $\gamma$-роста}\label{sec:ch3/sect3}
     Механика рестартов является достаточно популярным направлением для улучшения оценок скорости сходимости при дополнительных условиях. Часто в качестве дополнительного условия выступает именно упомянутое ранее условие острого минимума (см. например \cite{sharp_rest} или часть посвященную рестартам в \cite{sharp22}).
     Воспользуемся следующим результатом (см. (6) из \cite{Lu_2018}):
     \begin{theorem} \label{vanilla_mirror}
-        Пусть $f$ --- является $M$-липшицевой на $Q$ относительно некоторой дивергенции Брэгмана $V(x, y)$ c сильно выпуклой прокс-функцией $d(x)$. Тогда можно задать метод следующим образом:
+        Пусть $f$ является относительно $M$-липшицевой на $Q$. Тогда можно задать метод следующим образом:
         \begin{equation} \label{mirr_upd}
             x_{k+1} = \arg \min_{x \in Q} {\left[ f(x_k) + \langle \nabla f(x_k), x - x_k \rangle + \frac{1}{h_k} V(x, x_k)\right]},
         \end{equation}
@@ -122,6 +122,10 @@
             \min_{0\leq k \leq N} f(x_k) - f(x) \leq \frac{\frac{1}{2} M^2 \sum_{k=0}^N h_k^2 + V(x, x_0)}{\sum_{k=0}^N h_k}
         \end{equation}
     \end{theorem}
+    В дальнейших рассуждениях будем обозначать 
+     \[
+        x_{min}^j  := \argmin_{0\leq k \leq N} f(x_k) \;\;\; \text{на} \;\; j\text{-м рестарте}.
+     \]
 
     \begin{remark}
         Если в \eqref{mirr_upd} в формулировке теоремы \ref{vanilla_mirror} выбрать шаг следующим образом:
@@ -130,7 +134,7 @@
         \end{equation}
         то можно выписать такую оценку скорости сходимости:
         \begin{equation} \label{mirr_est}
-            f(\widehat{x_N}) - f(x_*) \leq \frac{M\sqrt{2 \left[\min\limits_{x_* \in X_*}{V(x_*, x_0)}\right]}}{\sqrt{N}}.
+            f(x_{min}) - f(x_*) \leq \frac{M\sqrt{2 \left[\min\limits_{x_* \in X_*}{V(x_*, x_0)}\right]}}{\sqrt{N}}.
         \end{equation}
     \end{remark}
     Если функция обладает дополнительными свойствами, аналогичными острому минимуму,  то становится возможным применение техники рестартов. Используем аналог данного условия и вслед за Шапиро–Немировским (см. \cite{shapiro_2005} и \cite{shapiro_2021} ) впервые введем условие относительного $\gamma$-роста ($\gamma \geq 1$). Отметим, что подобное условие впервые вводится с использованием дивергенции Брэгмана, что позволяет обобщить ряд условий, таких как условия острого минимума, квадратичного доминирования и $\gamma$-роста.
@@ -141,10 +145,14 @@
        \end{equation}
        где $X_*$ --- множество возможный решений задачи минимизации $f$. 
     \end{definition}
+    Введем следующее обозначение
+    \[
+        x_0^j \text{--- стартовая точка для } j\text{-го рестарта}.
+    \]
     
-    Справедлива следующая теорема:
+    Справедлива следующая теорема
     \begin{theorem} \label{simple_restart}
-        Пусть $f$ --- удовлетворяет условию относительного $\gamma$-роста \eqref{gamma-growth} и также является $M$-липшицевой на $Q$ относительно некоторой функции Брэгмана $V(x, y)$. В таком случае Алгоритм \ref{alg:rest_gamma} после 
+        Пусть $f$ удовлетворяет условию относительного $\gamma$-роста \eqref{gamma-growth} и также является $M$-липшицевой на $Q$. В таком случае алгоритм \ref{alg:rest_gamma} после 
         \begin{equation}
         \begin{aligned}
            N =\mathcal{O}\left(\frac{2 M^2}{\mu_{\gamma}^2} \log_2{\frac{\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}}{\varepsilon}}\right) \text{ при } \gamma = 1, \\
@@ -153,11 +161,11 @@
         \end{equation}
         обращений к субградиенту $f$ будут справедливы неравенства:
         \begin{equation}
-            \min_{x_* \in X_*}{V(x_*, \widehat{x_p})} \leq \varepsilon
+            \min_{x_* \in X_*}{V(x_*, x_{min}^p)} \leq \varepsilon
         \end{equation}
         и
         \begin{equation}
-            f(\widehat{x_p}) - f(x_*) \leq M \sqrt{2 \varepsilon}.  
+            f(x_{min}^p) - f(x_*) \leq M \sqrt{2 \varepsilon}.  
         \end{equation}
     \end{theorem}
 
@@ -167,11 +175,9 @@
         \KwData{$\varepsilon > 0$}
         \KwResult{$x_p$}
         $p \gets 0$\;
-        $\min\limits_{x_* \in X_*}{V(x_*, x_0)} \gets \min\limits_{x_* \in X_*}{V(x_*,x_0^0)}$\;
-        \While{$p < \log_2\left(\frac{\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}}{\varepsilon}\right).$}{
-            $x_{p}$ --- результат работы метода \eqref{mirr_upd} с шагом \eqref{mirr_step} и параметром $N_{p} = \ceil*{\frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{p(1 - \gamma)}} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{1 - \gamma}}$\;
-            $x_0 = \widehat{x_p}$\;
-            $\min\limits_{x_* \in X_*}{V(x_*, x_0)} \gets \frac{1}{2^{p+1}}\min\limits_{x_* \in X_*}{V_{0}(x_*, x_0^0)}$\;
+        \While{$p < \log_2\left(\frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)}}{\varepsilon}\right).$}{
+            $x_{p}$ --- результат работы метода \eqref{mirr_upd} с шагом \eqref{mirr_step} и параметром $N_{p} = \ceil*{\frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{p(1 - \gamma)}} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0)}\right)^{1 - \gamma}}$\;
+            $x_0 = x_{min}^p$\;
             $p=p+1$\;
         }
     \end{algorithm}
@@ -179,20 +185,20 @@
     \begin{proof}
        В доказательстве используется обозначение $x_m^n$, где $m = 0...N$ соответствует номеру итерации и $n = 0...p$ соответствует номеру рестарта метода \eqref{mirr_upd}. С учетом \eqref{gamma-growth} и \eqref{mirr_est} имеем: 
        $$
-           \mu_{\gamma}\left(\min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^0})}\right)^{\gamma/2} \leq f(\widehat{x_N^0}) - f(x_*) \leq \frac{M\sqrt{\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}}}{\sqrt{N}}.
+           \mu_{\gamma}\left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)}\right)^{\gamma/2} \leq f(x_{min}^0) - f(x_*) \leq \frac{M\sqrt{\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}}}{\sqrt{N}}.
        $$
-       Поэтому для точки выхода $\widehat{x_N^0}$ после $N$ итераций метода \eqref{mirr_upd}
+       Поэтому для точки выхода $x_{min}^0$ после $N$ итераций метода \eqref{mirr_upd}
        $$
-           \mu_{\gamma}\left(\min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^0})}\right)^{\gamma/2} \leq \frac{M\sqrt{\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}}}{\sqrt{N}},
-       $$
-       $$
-           \left(\min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^0})}\right)^{\gamma/2} \leq \frac{M\sqrt{\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}}}{\mu_{\gamma}\sqrt{N}},
+           \mu_{\gamma}\left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)}\right)^{\gamma/2} \leq \frac{M\sqrt{\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}}}{\sqrt{N}},
        $$
        $$
-           \min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^0})} \leq \left(\frac{M}{\mu_{\gamma}\sqrt{N}}\right)^{\frac{2}{\gamma}} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{\frac{1}{\gamma}}
+           \left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)}\right)^{\gamma/2} \leq \frac{M\sqrt{\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}}}{\mu_{\gamma}\sqrt{N}},
        $$
        $$
-           \min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^0})} \leq \left[\min\limits_{x_* \in X_*}{V(x_*, x_0^0)} \right] \left[\frac{M}{\mu_{\gamma}\sqrt{N}}\right]^{\frac{2}{\gamma}} \left[\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right]^{\frac{1}{\gamma} - 1}
+           \min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)} \leq \left(\frac{M}{\mu_{\gamma}\sqrt{N}}\right)^{\frac{2}{\gamma}} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{\frac{1}{\gamma}}
+       $$
+       $$
+           \min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)} \leq \left[\min\limits_{x_* \in X_*}{V(x_*, x_0^0)} \right] \left[\frac{M}{\mu_{\gamma}\sqrt{N}}\right]^{\frac{2}{\gamma}} \left[\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right]^{\frac{1}{\gamma} - 1}
        $$
        Основываясь на полученной закономерности проведем последовательные оценки для первых нескольких рестартов. Подберем $N$ так, чтобы было заведомо было верно неравенство
        $$
@@ -210,45 +216,45 @@
        $$
            N \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{1 - \gamma}  
        $$
-       Аналогично рассуждая, получаем для 1-го запуска метода \eqref{mirr_upd} $x_0^1 = \widehat{x_N^0}$:
+       Аналогично рассуждая, получаем для 1-го запуска метода \eqref{mirr_upd} $x_0^1 = x_{min}^0$:
        $$
-           \min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^1})} \leq \frac{1}{2} \min\limits_{x_* \in X_*}{V(x_*, x_0^1)} = \frac{1}{2} \min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^0})} \leq \left(\frac{1}{2}\right)^2 \min\limits_{x_* \in X_*}{V(x_*, x_0^0)}
+           \min\limits_{x_* \in X_*}{V(x_*, x_{min}^1)} \leq \frac{1}{2} \min\limits_{x_* \in X_*}{V(x_*, x_0^1)} = \frac{1}{2} \min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)} \leq \left(\frac{1}{2}\right)^2 \min\limits_{x_* \in X_*}{V(x_*, x_0^0)}
        $$
        после:
        $$
-           N_1 \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0^1)}\right)^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^0})}\right)^{1 - \gamma} 
+           N_1 \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0^1)}\right)^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)}\right)^{1 - \gamma} 
        $$
        обращений к алгоритму \eqref{mirr_upd} при $\gamma > 1$:
        $$
-           \min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^0})} \leq \frac{1}{2}\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}  
+           \min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)} \leq \frac{1}{2}\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}  
        $$
        $$
-           \left(\min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^0})}\right)^{\gamma - 1} \leq \left(\frac{1}{2} \min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{\gamma - 1}
+           \left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)}\right)^{\gamma - 1} \leq \left(\frac{1}{2} \min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{\gamma - 1}
        $$
        $$
-            \left(\frac{1}{2} \min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{1 - \gamma} \leq \left(\min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^0})}\right)^{1 - \gamma}
+            \left(\frac{1}{2} \min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{1 - \gamma} \leq \left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)}\right)^{1 - \gamma}
        $$
        соответственно:
        $$
        \begin{aligned}
-           N_1 \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^0})}\right)^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\frac{1}{2} \min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{1 - \gamma} =\\
+           N_1 \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^0)}\right)^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\frac{1}{2} \min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{1 - \gamma} =\\
            = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{1-\gamma}} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{1 - \gamma}
        \end{aligned}
        $$
-       Для 2-го запуска $x_0^2 = \widehat{x_N^1}$. Тогда
+       Для 2-го запуска $x_0^2 = x_{min}^1$. Тогда
        $$
-           \min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^2})} \leq \frac{1}{2} \min\limits_{x_* \in X_*}{V(x_*, x_0^2)} \leq (\frac{1}{2})^3 \min\limits_{x_* \in X_*}{V(x_*, x_0^0)} 
+           \min\limits_{x_* \in X_*}{V(x_*, x_{min}^2)} \leq \frac{1}{2} \min\limits_{x_* \in X_*}{V(x_*, x_0^2)} \leq (\frac{1}{2})^3 \min\limits_{x_* \in X_*}{V(x_*, x_0^0)} 
        $$
        после не более, чем $N_2$ обращений к субградиенту, где
        $$
        \begin{aligned}
-           N_2 \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0^2)}\right)^{1 - \gamma} = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^1})}\right)^{1 - \gamma} \geq\\
+           N_2 \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0^2)}\right)^{1 - \gamma} = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \left(\min\limits_{x_* \in X_*}{V(x_*, x_{min}^1)}\right)^{1 - \gamma} \geq\\
            \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{1 - \gamma}} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0^1)}\right)^{1 - \gamma} \geq \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2 2^{2(1 - \gamma)}} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{1 - \gamma}
        \end{aligned}
        $$
        Наконец, для $(p-1)$-го запуска имеем:
        \begin{equation} \label{v_seq}
-           \min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^{p-1}})} \leq \frac{1}{2^p} \min\limits_{x_* \in X_*}{V(x_*, x_0^0)}
+           \min\limits_{x_* \in X_*}{V(x_*, x_{min}^{p - 1})} \leq \frac{1}{2^p} \min\limits_{x_* \in X_*}{V(x_*, x_0^0)}
        \end{equation}
        после:
        \begin{equation} \label{n_seq}
@@ -261,9 +267,9 @@
            = \frac{M^2 2^{\gamma}}{\mu_{\gamma}^2} \frac{1 - 2^{(p-1)(\gamma-1)}}{1 - 2^{(\gamma-1)}} \left(\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right)^{1 - \gamma}
        \end{aligned}
        \end{equation}
-       Удаленность от решения оценим, используя $\min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^{p-1}})}$:
+       Удаленность от решения оценим, используя $\min\limits_{x_* \in X_*}{V(x_*, x_{min}^{p - 1})}$:
        $$
-           \min\limits_{x_* \in X_*}{V(x_*, \widehat{x_N^{p-1}})} \leq \frac{1}{2^p} \min\limits_{x_* \in X_*}{V(x_*, x_0^0)} \leq \varepsilon
+           \min\limits_{x_* \in X_*}{V(x_*, x_{min}^{p - 1})} \leq \frac{1}{2^p} \min\limits_{x_* \in X_*}{V(x_*, x_0^0)} \leq \varepsilon
        $$
        $$
             2^p \geq \frac{1}{\varepsilon} \min\limits_{x_* \in X_*}{V(x_*, x_0^0)}
@@ -298,12 +304,12 @@
        $$
        Оценим невязку по функции после указанного количества итераций:
        $$
-            f(\widehat{x_p}) - f(x_*) \leq  \langle \nabla f(\widehat{x_p}), \widehat{x_p} - x_* \rangle \leq M \sqrt{ 2 \left[\min_{x_* \in X_*}{V(x_*, \widehat{x_p})}\right]} \leq M \sqrt{2 \varepsilon}.  
+            f(x_{min}^p) - f(x_*) \leq  \langle \nabla f(x_{min}^p), x_{min}^p - x_* \rangle \leq M \sqrt{ 2 \left[\min_{x_* \in X_*}{V(x_*, x_{min}^p)}\right]} \leq M \sqrt{2 \varepsilon}.  
         $$
     \end{proof}
     Также путем замены $\delta := M \sqrt{2 \varepsilon}$ в предыдущей теореме можно сформулировать следующее замечание:
     \begin{remark}
-        Пусть $f$ --- удовлетворяет условию $\gamma$-роста \eqref{gamma-growth} и также является $M$-липшицевой на $Q$ относительно некоторой дивергенции Брэгмана $V(x, y)$. В таком случае для Алгоритма \ref{alg:rest_gamma} после
+        Пусть $f$ удовлетворяет условию $\gamma$-роста \eqref{gamma-growth} и также является относительно $M$-липшицевой на $Q$. В таком случае для алгоритма \ref{alg:rest_gamma} после
         \begin{equation}
             \begin{aligned}
                N = \mathcal{O}\left(\frac{2 M^2}{\mu_{\gamma}^2} \log_2{\frac{2 M^2 \left[\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}\right]}{\delta^2}}\right) \text{ при } \gamma = 1, \\
@@ -312,26 +318,26 @@
         \end{equation}
         обращений к субградиенту $f$, причем будут справедливы неравенства:
         \begin{equation}
-           f(\widehat{x_p}) - f(x_*)  \leq \delta 
+           f(x_{min}^p) - f(x_*)  \leq \delta 
         \end{equation}
         и
         \begin{equation}
-           \min\limits_{x_* \in X_*}{V(x_*, \widehat{x_p})} \leq \frac{\delta^2}{2 M^2}.
+           \min\limits_{x_* \in X_*}{V(x_*, x_{min}^p)} \leq \frac{\delta^2}{2 M^2}.
         \end{equation}
     \end{remark}
 
-\section{Адаптивный вариант зеркального спуска для липшицевых задач с гамма-ростом}\label{sec:ch3/sect4}
+\section{Адаптивный критерий остановки каждого из рестартов зеркального спуска для липшицевых задач с относительным $\gamma$-ростом}\label{sec:ch3/sect4}
 
     Для дальнейших рассуждений необходим адаптивный аналог оценки \eqref{general_est}. Воспользуемся результатом, полученным в замечании \ref{remark4} к лемме \ref{th:base}. При помощи данного результата проведем замену глобальной константы $M$ на локальные значения в теореме \ref{vanilla_mirror}. Сформулируем и докажем следующее соответствующее данному подходу предложение:
     \begin{proposition} \label{adapt_mirror}
-        Пусть $f$ является $M$-липшицевой на $Q$ относительно некоторой функции Брэгмана $V(x, y)$ c 1-сильно выпуклой прокс-функцией $d(x)$.
+        Пусть $f$ является относительно $M$-липшицевой на $Q$, причем прокс-функция $d(x)$ является 1-сильно выпуклой.
         Зададим метод аналогично теореме \ref{vanilla_mirror}: 
         \begin{equation} \label{adapt_upd}
             x_{k+1} = \arg \min_{x \in Q} {\left[ f(x_k) + \langle \nabla f(x_k), x - x_k \rangle + \frac{1}{h_k} V(x, x_k)\right]},
         \end{equation}
         где $\{ h_k \}$ - последовательность размеров шагов. Тогда справедлива следующая оценка:
         \begin{equation} \label{adapt_est}
-            \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_2} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} }{\sum_{k=0}^N h_k}.
+            \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_*} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} }{\sum_{k=0}^N h_k}.
         \end{equation}
     \end{proposition}
 
@@ -339,25 +345,25 @@
        Пусть алгоритм \eqref{adapt_upd} отработал $N$ шагов, тогда просуммируем неравенства \eqref{base_eq} (из замечания \ref{remark4}):
        $$
        \begin{aligned}
-           h_k (f(x_k) - f(x_*)) \leq h_k \langle \nabla f(x_k), x_k - x_* \rangle \leq \frac{h_k^2}{2} \norm{\nabla f(x_k)}^2_2 + \min\limits_{x_* \in X_*}{V(x_*, x_k)} - \\
+           h_k (f(x_k) - f(x_*)) \leq h_k \langle \nabla f(x_k), x_k - x_* \rangle \leq \frac{h_k^2}{2} \norm{\nabla f(x_k)}^2_* + \min\limits_{x_* \in X_*}{V(x_*, x_k)} - \\
            - \min\limits_{x_* \in X_*}{V(x_*, x_{k+1})}
        \end{aligned}
        $$
        $$
-           \sum_{k=0}^N h_k (f(x_k) - f(x_*)) \leq \sum_{k=0}^N \frac{h_k^2}{2} \norm{\nabla f(x_k)}^2 + \sum_{k=0}^N (\min\limits_{x_* \in X_*}{V(x_*, x_k)} - \min\limits_{x_* \in X_*}{V(x_*, x_{k+1})})
+           \sum_{k=0}^N h_k (f(x_k) - f(x_*)) \leq \sum_{k=0}^N \frac{h_k^2}{2} \norm{\nabla f(x_k)}^2_* + \sum_{k=0}^N (\min\limits_{x_* \in X_*}{V(x_*, x_k)} - \min\limits_{x_* \in X_*}{V(x_*, x_{k+1})})
        $$
        $$
        \begin{aligned}
-           \frac{\sum_{k=0}^N h_k f(x_k)} {\sum_{k=0}^N h_k} - f(x_*) \leq & \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2} {2 \sum_{k=0}^N h_k} + \\
+           \frac{\sum_{k=0}^N h_k f(x_k)} {\sum_{k=0}^N h_k} - f(x_*) \leq & \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_*} {2 \sum_{k=0}^N h_k} + \\
            & + \frac{\sum_{k=0}^N \left(\min\limits_{x_* \in X_*}{V(x_*, x_k)} - \min\limits_{x_* \in X_*}{V(x_*, x_{k+1})}\right)}{\sum_{k=0}^N h_k}
        \end{aligned}
        $$
        И, наконец,
        $$
-           \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_2} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} - \min\limits_{x_* \in X_*}{V(x_*, x_N)} }{\sum_{k=0}^N h_k} \leq
+           \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_*} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} - \min\limits_{x_* \in X_*}{V(x_*, x_N)} }{\sum_{k=0}^N h_k} \leq
        $$
        $$
-           \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_2} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)}}{\sum_{k=0}^N h_k}.
+           \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_*} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)}}{\sum_{k=0}^N h_k}.
        $$
     \end{proof}
     На практике для использования приведенной выше теоремы \ref{simple_restart} требуется знание о точном решении для оценки $\min\limits_{x_* \in X_*}{V(x_*, x_0)}$, что лишает данный метод практической пользы. 
@@ -370,47 +376,47 @@
     Таким образом, можно продолжить замечание \ref{adapt_mirror} заменой расстояния Брэгмана оценкой сверху:
     \begin{equation} \label{adapt_est_theta}
     \begin{aligned}
-        \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_2} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} }{\sum_{k=0}^N h_k} \leq \\
-        \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_2} {2 \sum_{k=0}^N h_k} + \frac{\Theta^2}{\sum_{k=0}^N h_k}.
+        \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_*} {2 \sum_{k=0}^N h_k} + \frac{\min\limits_{x_* \in X_*}{V(x_*, x_0)} }{\sum_{k=0}^N h_k} \leq \\
+        \leq \frac{\sum_{k=0}^N h_k^2 \norm{\nabla f(x_k)}^2_*} {2 \sum_{k=0}^N h_k} + \frac{\Theta^2}{\sum_{k=0}^N h_k}.
     \end{aligned}
     \end{equation}
     Используем данный результат и предложим следующий критерий остановки.
     \begin{remark}
         Если в \eqref{adapt_upd} выбрать шаг следующим образом:
         \begin{equation} \label{eps_step}
-            h_{k} = \frac{\varepsilon}{\norm{\nabla f(x_k)}^2_2},
+            h_{k} = \frac{\varepsilon}{\norm{\nabla f(x_k)}^2_*},
         \end{equation}
         и воспользоваться критерием остановки метода: 
         \begin{equation} \label{stop_crit}
-            \sum_{k=0}^N \frac{1} {\norm{\nabla f(x_k)}^2_2} \geq \frac{2 \Theta^2}{\varepsilon^2}, \;\;\;\;\text{ где } \Theta \geq \min\limits_{x_* \in X_*}{V(x_*, x_0)},
+            \sum_{k=0}^N \frac{1} {\norm{\nabla f(x_k)}^2_*} \geq \frac{2 \Theta^2}{\varepsilon^2}, \;\;\;\;\text{ где } \Theta \geq \min\limits_{x_* \in X_*}{V(x_*, x_0)},
         \end{equation}
         тогда для невязки по функции можно показать следующее (прямое следствие \eqref{adapt_est_theta}):
         \begin{equation} 
         \begin{aligned}
-            \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\varepsilon}{2} + \frac{\Theta^2}{\varepsilon \sum_{k=0}^N \frac{1} {\norm{\nabla f(x_k)}^2_2}} \leq \varepsilon.
+            \min_{0\leq k \leq N} f(x_k) - f(x_*) \leq \frac{\varepsilon}{2} + \frac{\Theta^2}{\varepsilon \sum_{k=0}^N \frac{1} {\norm{\nabla f(x_k)}^2_*}} \leq \varepsilon.
         \end{aligned}
         \end{equation}
      \end{remark}
-     В дальнейших рассуждениях будем обозначать 
-     \[
-        x_{min}^j  := \argmin_{0\leq k \leq N} f(x_k) \;\;\; \text{на} \;\; j\text{-м рестарте}.
-     \]
-     Предложим следующий Алгоритм \ref{alg:rest_criteria}. 
+     Предложим следующий алгоритм \ref{alg:rest_criteria}. 
      \begin{algorithm}[htp]
         \caption{Рестарты зеркального спуска при условии $\gamma$-роста с критерием остановки.}
         \label{alg:rest_criteria}
         \KwData{$\varepsilon > 0$}
         \KwResult{$x_p$}
         $p \gets 0$\;
-        $\Theta_0 \geq \min\limits_{x_* \in X_*}{V(x_*,x_0^0)}$\;
+        $\Theta_0 \geq \min\limits_{x_* \in X_*}{V(x_*,x_0)}$\;
         \While{$p < \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{\Theta_0^2}{2}\right]}.$}{
-            $x_{p}$ --- результат работы метода \eqref{mirr_upd} с шагом \eqref{eps_step} и критерием остановки $\sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{ 2^{(p \gamma - p + \gamma + 1)}}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} } $, где $N_p$ --- количество итераций на данном рестарте метода\;
+            $x_{p}$ --- результат работы метода \eqref{mirr_upd} с шагом \eqref{eps_step} и критерием остановки $\sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_*^2} \geq \frac{ 2^{(p \gamma - p + \gamma + 1)}}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} } $, где $N_p$ --- количество итераций на данном рестарте метода\;
             $x_0 = x_{min}^p$\;
             $p=p+1$\;
         }
     \end{algorithm}
     \begin{theorem}
-        Пусть $f$ удовлетворяет условию $\gamma$-роста \eqref{gamma-growth} и также является $M$-липшицевой на $Q$ относительно некоторой дивергенции Брэгмана $V(x, y)$. В таком случае Алгоритм \ref{alg:rest_criteria} после 
+        Пусть $f$ удовлетворяет условию относительного $\gamma$-роста \eqref{gamma-growth} и также является $M$-липшицевой на $Q$. В таком случае после работы алгоритма \ref{alg:rest_criteria} будет справедливо неравенство
+        \begin{equation}
+            f(x_{min}^N) - f(x_*) \leq \varepsilon.
+        \end{equation}
+        Для этого потребуется не более чем
         \begin{equation}
            N = \mathcal{O} \left( \frac{4 M^2}{\mu_{\gamma}^2} \log_2{\left[\left(\frac{\mu_{\gamma}}{\varepsilon}\right)^{\frac{2}{\gamma}} \frac{\Theta_0^2}{2}\right]}\right) \text{ при } \gamma = 1
         \end{equation}
@@ -418,16 +424,13 @@
         \begin{equation}
            N = \mathcal{O}\left( \frac{2 M^2 }{2^{\gamma - 1} - 1}\left[ \frac{2}{\mu_{\gamma}^{\frac{2}{\gamma}}}\varepsilon^{\frac{2}{\gamma} - 2} - \frac{2^{\gamma}}{\mu_{\gamma}^2 \Theta_0^{2(\gamma - 1)}} \right] \right) \text{ при } \gamma > 1
         \end{equation}
-        обращений к оракулу, где $\Theta_0$ --- это оценка сверху для $\min\limits_{x_* \in X_*}{V(x_*, x_0^0)}$, будет справедливо неравенство
-        \begin{equation}
-            f(x_{min}^N) - f(x_*) \leq \varepsilon.
-        \end{equation}
+        обращений к оракулу, где $\Theta_0$ --- это оценка сверху для $\min\limits_{x_* \in X_*}{V(x_*, x_0)}$.
     \end{theorem}
 
     \begin{proof}
        Воспользуемся предположением:
        $$
-           \min\limits_{x_* \in X_*}{V(x_*, x_0^0)} \leq \Theta_0^2
+           \min\limits_{x_* \in X_*}{V(x_*, x_0)} \leq \Theta_0^2
        $$
        Поскольку начальный $\varepsilon_0$ является произвольным, выберем его так, чтобы выполнялась цепочка неравенств:
        $$
@@ -459,15 +462,15 @@
        $$
        С учетом критерия остановки алгоритма \ref{alg:rest_criteria} получаем
        \begin{equation} \label{krit}
-           \sum_{k=0}^{N_0} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{2 \Theta_0^2}{\varepsilon_0^2} = \frac{2 \Theta_0^2}{{\frac{\mu_{\gamma}^2 \Theta_0^{2\gamma}}{2^{\gamma}}}} = \frac{2^{\gamma + 1}}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2}}
+           \sum_{k=0}^{N_0} \frac{1}{\norm{\nabla f(x_k) }_*^2} \geq \frac{2 \Theta_0^2}{\varepsilon_0^2} = \frac{2 \Theta_0^2}{{\frac{\mu_{\gamma}^2 \Theta_0^{2\gamma}}{2^{\gamma}}}} = \frac{2^{\gamma + 1}}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2}}
        \end{equation}
-       Если $\norm{\nabla f(x_k) }_2 \leq M$, то
+       Если $\norm{\nabla f(x_k) }_* \leq M$, то
        \[
-           \sum_{k=0}^{N_0} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{N_0}{M^2}.
+           \sum_{k=0}^{N_0} \frac{1}{\norm{\nabla f(x_k) }_*^2} \geq \frac{N_0}{M^2}.
        \]
        Значит критерий остановки \eqref{krit} будет заведомо выполнен при
        \[
-            \sum_{k=0}^{N_0} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{N_0}{M^2} \geq \frac{2^{\gamma + 1}}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2}},
+            \sum_{k=0}^{N_0} \frac{1}{\norm{\nabla f(x_k) }_*^2} \geq \frac{N_0}{M^2} \geq \frac{2^{\gamma + 1}}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2}},
        \]
        соответственно:
        $$
@@ -511,11 +514,11 @@
        \]
        Соответствующий критерий остановки на $p$-м рестарте:
        \[
-           \sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{2 \Theta_p^2}{\varepsilon_p^2} = \frac{2 \Theta_0^2}{{2^p \mu_{\gamma}^2 \frac{ \Theta_0^{2\gamma}}{2^{\gamma(p + 1)}}}} = \frac{1}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} 2^{(p - \gamma p - \gamma - 1)}}.
+           \sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_*^2} \geq \frac{2 \Theta_p^2}{\varepsilon_p^2} = \frac{2 \Theta_0^2}{{2^p \mu_{\gamma}^2 \frac{ \Theta_0^{2\gamma}}{2^{\gamma(p + 1)}}}} = \frac{1}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} 2^{(p - \gamma p - \gamma - 1)}}.
        \]
        Он заведомо выполнен при
        \[
-           \sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_2^2} \geq \frac{N_p}{M^2} \geq \frac{1}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} 2^{(p - \gamma p - \gamma - 1)}},
+           \sum_{k=0}^{N_p} \frac{1}{\norm{\nabla f(x_k) }_*^2} \geq \frac{N_p}{M^2} \geq \frac{1}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} 2^{(p - \gamma p - \gamma - 1)}},
        \]
        \[
            N_p \geq \frac{M^2}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} 2^{(p - \gamma p - \gamma - 1)}} = \frac{M^2 2^{(\gamma + 1)}}{\mu_{\gamma}^2 \Theta_0^{2\gamma - 2} } 2^{p(\gamma - 1)}.
@@ -523,7 +526,7 @@
        \iffalse
        Используя полученное неравенство мы получаем следующую оценку для $N_p$:
        \[
-            N_p \geq \frac{2 \cdot 2^{\gamma} \cdot 2^{p\gamma} M^2}{2^p \mu_{\gamma}^2} \min\limits_{x_* \in X_*}{V(x_*, x_0^0)}^{(1 - \gamma)}
+            N_p \geq \frac{2 \cdot 2^{\gamma} \cdot 2^{p\gamma} M^2}{2^p \mu_{\gamma}^2} \min\limits_{x_* \in X_*}{V(x_*, x_0)}^{(1 - \gamma)}
        \]
        \fi
        Используя данный подход получим следующую оценку (достаточно завышенную):
