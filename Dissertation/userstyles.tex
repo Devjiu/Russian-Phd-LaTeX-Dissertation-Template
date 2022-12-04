@@ -219,15 +219,11 @@
         \lstinputlisting{VerbEnv.tmp}}
     \minipage{\@tempdima}\lstinputlisting{VerbEnv.tmp}\endminipage}
 \makeatother
-
 \DefineVerbatimEnvironment% с шрифтом 12 пт
 {Verb}{Verbatim}
 {fontsize=\fontsize{12pt}{14pt}\selectfont}
-
 \newfloat[chapter]{ListingEnv}{lol}{Листинг}
-
 \renewcommand{\lstlistingname}{Листинг}
-
 %Общие счётчики окружений листингов
 %http://tex.stackexchange.com/questions/145546/how-to-make-figure-and-listing-share-their-counter
 % Если смешивать плавающие и не плавающие окружения, то могут быть проблемы с нумерацией
@@ -238,7 +234,6 @@
     \let\ftype@lstlisting\ftype@ListingEnv % give the floats the same precedence
 }
 \makeatother
-
 % значок С++ — используйте команду \cpp
 \newcommand{\cpp}{%
     C\nolinebreak\hspace{-.05em}%

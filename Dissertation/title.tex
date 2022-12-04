@@ -37,9 +37,9 @@
 
 \vspace{0pt plus2fill} %число перед fill = кратность относительно некоторого расстояния fill, кусками которого заполнены пустые места
 {%\small
-Специальность \thesisSpecialtyNumber\ "---
+Специальность \thesisSpecialtyNumber.
 
-<<\thesisSpecialtyTitle>>
+\thesisSpecialtyTitle
 }
 
 \ifdefined\thesisSpecialtyTwoNumber
@@ -59,33 +59,41 @@
 \vspace{0pt plus4fill} %число перед fill = кратность относительно некоторого расстояния fill, кусками которого заполнены пустые места
 \begin{flushright}
 \ifdefined\supervisorTwoFio
-Научные руководители:
+  Научные руководители:
 
-\supervisorRegalia
+  \supervisorRegalia
 
-\ifdefined\supervisorDead
-\framebox{\supervisorFio}
+  \ifdefined\supervisorDead
+    \framebox{\supervisorFio}
+  \else
+    \supervisorFio
+  \fi
+
+  \supervisorTwoRegalia
+
+  \ifdefined\supervisorTwoDead
+    \framebox{\supervisorTwoFio}
+  \else
+    \supervisorTwoFio
+  \fi
 \else
-\supervisorFio
-\fi
+  Научный руководитель:
 
-\supervisorTwoRegalia
+  \supervisorRegalia
 
-\ifdefined\supervisorTwoDead
-\framebox{\supervisorTwoFio}
-\else
-\supervisorTwoFio
-\fi
-\else
-Научный руководитель:
+  \ifdefined\supervisorDead
+    \framebox{\supervisorFio}
+  \else
+    \supervisorFio
+  \fi
 
-\supervisorRegalia
+  \vspace{0pt plus1fill}
 
-\ifdefined\supervisorDead
-\framebox{\supervisorFio}
-\else
-\supervisorFio
-\fi
+  Научный консультант:
+
+  доктор физико-математических наук, доцент
+
+  Стонякин Федор Сергеевич
 \fi
 
 \end{flushright}

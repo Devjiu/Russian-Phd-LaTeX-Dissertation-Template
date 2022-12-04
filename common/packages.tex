@@ -27,6 +27,7 @@
 \usepackage{amsfonts,amssymb}       % Математические дополнения от AMS
 \usepackage{mathtools}              % Добавляет окружение multlined
 \usepackage{xfrac}                  % Красивые дроби
+\usepackage{cancel}
 \usepackage[
     locale = DE,
     list-separator       = {;\,},
@@ -40,6 +41,33 @@
     separate-uncertainty,
     ]{siunitx}[=v2]                 % Размерности SI
 \sisetup{inter-unit-product = \ensuremath{{}\cdot{}}}
+
+
+\usepackage{makecell}
+\ifpresentation
+\else
+    \usepackage{algorithm2e}
+    
+    \RestyleAlgo{ruled}
+    \theoremstyle{plain}
+    \newtheorem{theorem}{Теорема}
+    \newtheorem{proposition}{Предложение}
+    \newtheorem{assumption}{Предположение}
+    \newtheorem{lemma}{Лемма}
+    \newtheorem{corollary}{Следствие}
+    %\newtheorem{notation}{Обозначения}
+    \newtheorem{definition}{Определение}
+    \newtheorem{example}{Пример}
+
+    \theoremstyle{definition}
+    \newtheorem{proof_}{Доказательство}\def\theproof{}
+    \newtheorem{remark}{Замечание}
+\fi
+
+\DeclarePairedDelimiterX{\norm}[1]{\lVert}{\rVert}{#1}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
 
 % Кириллица в нумерации subequations
 % Для правильной работы требуется выполнение сразу после загрузки пакетов

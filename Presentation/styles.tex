@@ -1,7 +1,7 @@
 % Общие стили оформления.
 % Возможные варианты значений ищите в описании библиотеки beamer
-\usetheme{Pittsburgh}
-\usecolortheme{whale}
+\usetheme{Frankfurt}
+%\usecolortheme{whale}
 
 % \usetheme[secheader]{Boadilla}
 % \usecolortheme{seahorse}
@@ -12,6 +12,7 @@
 
 % выключение кнопок навигации
 \beamertemplatenavigationsymbolsempty
+\setbeamertemplate{headline}{}
 
 % Размеры шрифтов
 \setbeamerfont{title}{size=\large}
@@ -47,7 +48,11 @@
 
 % Использовать шрифт с засечками для формул
 % https://tex.stackexchange.com/a/34267/104425
-\usefonttheme[onlymath]{serif}
+%\usefonttheme[onlymath]{serif}
+\usefonttheme{professionalfonts}
+%\usepackage[ T1 ]{ fontenc } % Needed for Type1 Concrete
+%\usepackage{kmath}
+%\usepackage { concrete }
 
 % https://tex.stackexchange.com/a/291545/104425
 \makeatletter

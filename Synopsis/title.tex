@@ -22,7 +22,7 @@
 \thesisTitle}
 
 \vspace{0pt plus3fill} %число перед fill = кратность относительно некоторого расстояния fill, кусками которого заполнены пустые места
-{\large Специальность \thesisSpecialtyNumber\ "---\par <<\thesisSpecialtyTitle>>}
+{\large Специальность \thesisSpecialtyNumber. \par \thesisSpecialtyTitle}
 
 \ifdefined\thesisSpecialtyTwoNumber
 {\large Специальность \thesisSpecialtyTwoNumber\ "---\par <<\thesisSpecialtyTwoTitle>>}
@@ -39,7 +39,7 @@
 \newpage
 % оборотная сторона обложки
 \thispagestyle{empty}
-\noindent Работа выполнена в {\thesisInOrganization}.
+\noindent Работа прошла апробацию в {\thesisInOrganization}.
 
 \vspace{0.008\paperheight plus1fill}
 \noindent%
@@ -68,49 +68,52 @@
                               \textbf{\supervisorFio}
                               \fi
                               \vspace{0.013\paperheight}\\
+    Научный консультант:    & доктор физико-математических наук, доцент \par
+                              \ifdefined\supervisorDead
+                              \framebox{\textbf{\supervisorFio}}
+                              \else
+                              \textbf{Стонякин Федор Сергеевич}
+                              \fi
+                              \vspace{0.013\paperheight}\\
     \fi
-    Официальные оппоненты:  &
-    \ifnumequal{\value{showopplead}}{0}{\vspace{13\onelineskip plus1fill}}{%
-        \textbf{\opponentOneFio,}\par
-        \opponentOneRegalia,\par
-        \opponentOneJobPlace,\par
-        \opponentOneJobPost\par
-        \vspace{0.01\paperheight}
-        \textbf{\opponentTwoFio,}\par
-        \opponentTwoRegalia,\par
-        \opponentTwoJobPlace,\par
-        \opponentTwoJobPost
-    \ifdefined\opponentThreeFio
-        \par
-        \vspace{0.01\paperheight}
-        \textbf{\opponentThreeFio,}\par
-        \opponentThreeRegalia,\par
-        \opponentThreeJobPlace,\par
-        \opponentThreeJobPost
+    \iffalse
+        Официальные оппоненты:  &
+        \ifnumequal{\value{showopplead}}{0}{\vspace{13\onelineskip plus1fill}}{%
+            \textbf{\opponentOneFio,}\par
+            \opponentOneRegalia,\par
+            \opponentOneJobPlace,\par
+            \opponentOneJobPost\par
+            \vspace{0.01\paperheight}
+            \textbf{\opponentTwoFio,}\par
+            \opponentTwoRegalia,\par
+            \opponentTwoJobPlace,\par
+            \opponentTwoJobPost
+        \ifdefined\opponentThreeFio
+            \par
+            \vspace{0.01\paperheight}
+            \textbf{\opponentThreeFio,}\par
+            \opponentThreeRegalia,\par
+            \opponentThreeJobPlace,\par
+            \opponentThreeJobPost
+        \fi
+        }%
     \fi
-    }%
     \vspace{0.013\paperheight} \\
     \ifdefined\leadingOrganizationTitle
     Ведущая организация:    &
-    \ifnumequal{\value{showopplead}}{0}{\vspace{6\onelineskip plus1fill}}{%
         \leadingOrganizationTitle
-    }%
     \fi
 \end{tabularx}
-\vspace{0.008\paperheight plus1fill}
+\vspace{0.028\paperheight plus1fill}
 
-\noindent Защита состоится \defenseDate~на~заседании диссертационного совета \defenseCouncilNumber~при \defenseCouncilTitle~по адресу: \defenseCouncilAddress.
+\noindent Защита состоится \defenseDate~на~заседании диссертационного совета \defenseCouncilNumber~по адресу: \defenseCouncilAddress.
 
 \vspace{0.008\paperheight plus1fill}
 \noindent С диссертацией можно ознакомиться в библиотеке \synopsisLibrary.
 
 \vspace{0.008\paperheight plus1fill}
-\noindent Отзывы на автореферат в двух экземплярах, заверенные печатью учреждения, просьба направлять по адресу: \defenseCouncilAddress, ученому секретарю диссертационного совета~\defenseCouncilNumber.
-
-\vspace{0.008\paperheight plus1fill}
 \noindent{Автореферат разослан \synopsisDate.}
 
-\noindent Телефон для справок: \defenseCouncilPhone.
 
 \vspace{0.008\paperheight plus1fill}
 \noindent%
